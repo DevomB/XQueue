@@ -20,7 +20,7 @@
 
 ## Incident Response
 
-Report security issues to security@xqueue.app. We aim to respond within 72 hours.
+Report security issues to Devom.b@yahoo.com. We aim to respond within 72 hours.
 
 ## Account Deletion
 

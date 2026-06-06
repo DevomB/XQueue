@@ -18,7 +18,7 @@ export async function sendFailedPostEmail(params: {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
   await resend.emails.send({
-    from: process.env.EMAIL_FROM ?? "XQueue <noreply@xqueue.app>",
+    from: process.env.EMAIL_FROM ?? "XQueue <Devom.b@yahoo.com>",
     to: params.to,
     subject: "XQueue: Scheduled post failed to publish",
     html: `

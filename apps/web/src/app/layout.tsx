@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "XQueue — Schedule X posts in bulk",
   description:
-    "Schedule X posts in bulk. Close your browser — XQueue publishes at the right time via the official X API.",
+    "Queue and schedule X posts in bulk. Close your browser — XQueue publishes at the right time via the official X API.",
 };
 
 export default function RootLayout({
@@ -25,9 +25,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-white font-sans text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-50`}
+        className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-zinc-950 font-sans text-zinc-50 antialiased`}
       >
         <Providers>{children}</Providers>
       </body>

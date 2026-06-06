@@ -6,13 +6,21 @@ export async function SiteHeader() {
   const session = await auth();
 
   return (
-    <header className="border-b border-zinc-200 dark:border-zinc-800">
+    <header className="sticky top-0 z-50 border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-        <Link href="/" className="text-xl font-bold tracking-tight">
-          XQueue
+        <Link href="/" className="flex items-center gap-2">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-sky-500 text-sm font-bold text-zinc-950">
+            XQ
+          </span>
+          <span className="text-lg font-bold tracking-tight text-white">
+            XQueue
+          </span>
         </Link>
-        <nav className="flex items-center gap-4 text-sm">
-          <Link href="/pricing" className="text-zinc-600 hover:text-zinc-900 dark:text-zinc-400">
+        <nav className="flex items-center gap-5 text-sm">
+          <Link
+            href="/pricing"
+            className="text-zinc-400 transition-colors hover:text-white"
+          >
             Pricing
           </Link>
           {session ? (
@@ -21,7 +29,10 @@ export async function SiteHeader() {
             </Link>
           ) : (
             <>
-              <Link href="/login" className="text-zinc-600 hover:text-zinc-900 dark:text-zinc-400">
+              <Link
+                href="/login"
+                className="text-zinc-400 transition-colors hover:text-white"
+              >
                 Log in
               </Link>
               <Link href="/signup">

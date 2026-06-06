@@ -3,6 +3,8 @@ import path from "path";
 
 const LEGAL_FILES = ["terms.md", "privacy.md", "acceptable-use.md", "security.md"];
 
+const CONTACT_EMAIL = "Devom.b@yahoo.com";
+
 export async function loadLegalDoc(name: string): Promise<string> {
   if (!LEGAL_FILES.includes(name)) {
     throw new Error("Unknown legal document");
@@ -17,18 +19,32 @@ export function markdownToHtml(md: string): string {
     .split("\n")
     .map((line) => {
       if (line.startsWith("# ")) {
-        return `<h1 class="text-3xl font-bold mb-6">${escape(line.slice(2))}</h1>`;
+        return `<h1>${linkify(escape(line.slice(2)))}</h1>`;
       }
       if (line.startsWith("## ")) {
-        return `<h2 class="text-xl font-semibold mt-8 mb-3">${escape(line.slice(3))}</h2>`;
+        return `<h2>${linkify(escape(line.slice(3)))}</h2>`;
       }
       if (line.startsWith("- ")) {
-        return `<li class="ml-4">${escape(line.slice(2))}</li>`;
+        return `<li>${linkify(escape(line.slice(2)))}</li>`;
       }
-      if (!line.trim()) return "<br />";
-      return `<p class="mb-3 text-zinc-600 dark:text-zinc-400">${escape(line)}</p>`;
+      if (line.match(/^\d+\.\s/)) {
+        return `<li>${linkify(escape(line.replace(/^\d+\.\s/, "")))}</li>`;
+      }
+      if (!line.trim()) return "";
+      return `<p>${linkify(escape(line))}</p>`;
     })
+    .filter(Boolean)
     .join("\n");
+}
+
+function linkify(text: string): string {
+  if (text.includes(CONTACT_EMAIL)) {
+    return text.replace(
+      CONTACT_EMAIL,
+      `<a href="mailto:${CONTACT_EMAIL}">${CONTACT_EMAIL}</a>`
+    );
+  }
+  return text;
 }
 
 function escape(text: string): string {

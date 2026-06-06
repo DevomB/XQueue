@@ -15,4 +15,4 @@ You may not use XQueue to:
 
 We enforce per-plan monthly limits and may suspend accounts that violate this policy without refund.
 
-Report abuse: abuse@xqueue.app
+Report abuse: Devom.b@yahoo.com

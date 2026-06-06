@@ -1,16 +1,11 @@
-import { SiteHeader } from "@/components/layout/site-header";
-import { loadLegalDoc, markdownToHtml } from "@/lib/legal";
+import { LegalPage } from "@/components/layout/legal-page";
 
-export default async function PrivacyPage() {
-  const content = await loadLegalDoc("privacy.md");
-
+export default function PrivacyPage() {
   return (
-    <div className="min-h-screen">
-      <SiteHeader />
-      <main
-        className="prose mx-auto max-w-3xl px-4 py-16 dark:prose-invert"
-        dangerouslySetInnerHTML={{ __html: markdownToHtml(content) }}
-      />
-    </div>
+    <LegalPage
+      doc="privacy.md"
+      title="Privacy Policy"
+      description="How XQueue collects, uses, and protects your data."
+    />
   );
 }
