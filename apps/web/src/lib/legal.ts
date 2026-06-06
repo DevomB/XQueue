@@ -3,30 +3,12 @@ import path from "path";
 
 const LEGAL_FILES = ["terms.md", "privacy.md", "acceptable-use.md", "security.md"];
 
-async function resolveLegalPath(name: string): Promise<string> {
-  const candidates = [
-    path.join(process.cwd(), "..", "..", "docs", "legal", name),
-    path.join(process.cwd(), "docs", "legal", name),
-    path.join(process.cwd(), "..", "docs", "legal", name),
-  ];
-
-  for (const candidate of candidates) {
-    try {
-      await readFile(candidate, "utf-8");
-      return candidate;
-    } catch {
-      continue;
-    }
-  }
-
-  throw new Error(`Legal document not found: ${name}`);
-}
-
 export async function loadLegalDoc(name: string): Promise<string> {
   if (!LEGAL_FILES.includes(name)) {
     throw new Error("Unknown legal document");
   }
-  const filePath = await resolveLegalPath(name);
+
+  const filePath = path.join(process.cwd(), "content", "legal", name);
   return readFile(filePath, "utf-8");
 }
 

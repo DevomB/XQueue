@@ -22,13 +22,14 @@ Copy all variables from `.env.example`. Required for production:
 
 ## Vercel (web)
 
-1. Import repo, set root to `apps/web` or use monorepo config
-2. Build command: `cd ../.. && pnpm install && pnpm --filter @xqueue/shared build && pnpm --filter @xqueue/web build`
-3. Install command: `pnpm install`
-4. Add all env vars
-5. Run `pnpm db:push` against production DB once
-
-`vercel.json` is included at repo root.
+1. Import repo from GitHub
+2. **Root Directory:** `apps/web` (Project Settings → General)
+3. **Output Directory:** leave empty (defaults to `.next`). Do **not** set `apps/web/.next` — that doubles the path and breaks deploys.
+4. Build/install commands are in [`apps/web/vercel.json`](apps/web/vercel.json) — no dashboard overrides needed unless you prefer manual entry:
+   - Install: `cd ../.. && pnpm install`
+   - Build: `cd ../.. && pnpm --filter @xqueue/shared build && pnpm --filter @xqueue/web build`
+5. Add all env vars from `.env.example`
+6. Run `pnpm db:push` against production DB once
 
 ## Railway (worker)
 
