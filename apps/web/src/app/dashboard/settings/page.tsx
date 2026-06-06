@@ -23,6 +23,9 @@ function SettingsContent() {
   }, []);
 
   useEffect(() => {
+    // Fetch settings on mount + surface OAuth/billing redirect banners. The
+    // settings state updates happen after the await inside load().
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     load();
     const xConnected = searchParams.get("x_connected");
     const xError = searchParams.get("x_error");

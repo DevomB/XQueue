@@ -21,6 +21,9 @@ export default function QueuePage() {
   }, []);
 
   useEffect(() => {
+    // Fetch posts + settings once on mount; state updates happen after the
+    // await, not synchronously within the effect body.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     load();
   }, [load]);
 
