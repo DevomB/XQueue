@@ -39,6 +39,132 @@ body {
   );
 }
 
+/* ── Theme: "Signal in the dark" ──────────────────────────────── */
+
+/* Beam: the signal-blue → cyan brand gradient used on headlines/accents */
+.text-beam {
+  background-image: linear-gradient(100deg, #7dd3fc 0%, #38bdf8 45%, #22d3ee 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Soft dotted aura used behind product mocks / cards */
+.dot-field {
+  background-image: radial-gradient(rgb(56 189 248 / 0.12) 1px, transparent 1px);
+  background-size: 22px 22px;
+  mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black 10%, transparent 75%);
+}
+
+/* Thin animated conic border for the "featured" pricing/feature card */
+.beam-border {
+  position: relative;
+}
+.beam-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--beam-angle, 0deg),
+    transparent 0deg,
+    transparent 250deg,
+    #38bdf8 300deg,
+    #22d3ee 330deg,
+    transparent 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: beam-spin 6s linear infinite;
+  pointer-events: none;
+}
+
+@property --beam-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes beam-spin {
+  to {
+    --beam-angle: 360deg;
+  }
+}
+
+/* Marquee for the quiet social-proof strip */
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 38s linear infinite;
+}
+.marquee-mask {
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 12%,
+    black 88%,
+    transparent
+  );
+}
+.marquee-pause:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Scroll-reveal: fade + lift. Applied via IntersectionObserver toggling .is-in */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* Slow pulse for "live" status dots */
+.pulse-dot {
+  animation: pulse-dot 2.4s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgb(52 211 153 / 0.45);
+  }
+  50% {
+    opacity: 0.7;
+    box-shadow: 0 0 0 6px rgb(52 211 153 / 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track,
+  .beam-border::before,
+  .pulse-dot {
+    animation: none;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
 .legal-content h1 {
   font-size: 2.25rem;
   font-weight: 700;

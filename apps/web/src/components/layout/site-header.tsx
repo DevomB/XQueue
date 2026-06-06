@@ -18,6 +18,18 @@ export async function SiteHeader() {
         </Link>
         <nav className="flex items-center gap-5 text-sm">
           <Link
+            href="/#features"
+            className="hidden text-zinc-400 transition-colors hover:text-white sm:block"
+          >
+            Features
+          </Link>
+          <Link
+            href="/#faq"
+            className="hidden text-zinc-400 transition-colors hover:text-white sm:block"
+          >
+            FAQ
+          </Link>
+          <Link
             href="/pricing"
             className="text-zinc-400 transition-colors hover:text-white"
           >
