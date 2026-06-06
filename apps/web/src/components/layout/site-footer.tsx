@@ -1,12 +1,13 @@
 import Link from "next/link";
+import { BrandLogo } from "@/components/layout/brand-logo";
 
 export function SiteFooter() {
   return (
     <footer className="border-t border-zinc-800 bg-zinc-950">
       <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 py-12 md:flex-row md:items-start md:justify-between">
         <div>
-          <p className="text-lg font-bold tracking-tight text-white">XQueue</p>
-          <p className="mt-2 max-w-xs text-sm text-zinc-500">
+          <BrandLogo />
+          <p className="mt-3 max-w-xs text-sm text-zinc-500">
             Schedule X posts in bulk. Close the tab — we publish on time.
           </p>
         </div>

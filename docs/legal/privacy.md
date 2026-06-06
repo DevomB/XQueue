@@ -51,7 +51,7 @@ We share data only as needed to operate the Service:
 - **X (Twitter):** To publish posts and manage OAuth on your behalf.
 - **Stripe:** Payment processing and subscription management.
 - **Resend (or similar):** Transactional email delivery.
-- **Infrastructure providers:** Hosting (e.g., Vercel), databases, Redis, and background workers (e.g., Railway/Fly).
+- **Infrastructure providers:** Reputable hosting, database, and background-processing providers that run the Service on our behalf under data-protection agreements.
 
 We may disclose information if required by law, to protect rights and safety, or in connection with a merger or acquisition, with notice where legally permitted.
 
@@ -64,7 +64,7 @@ We may disclose information if required by law, to protect rights and safety, or
 
 ## 7. Security
 
-We use industry-standard measures including HTTPS in transit, bcrypt password hashing, and AES-256-GCM encryption for OAuth tokens. No method of transmission or storage is 100% secure; contact us if you suspect unauthorized access.
+We use industry-standard measures including encryption in transit, salted password hashing, and authenticated encryption for OAuth tokens at rest. No method of transmission or storage is 100% secure; contact us if you suspect unauthorized access.
 
 See our Security page for more detail.
 

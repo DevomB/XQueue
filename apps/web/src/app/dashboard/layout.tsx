@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { signOut } from "@/lib/auth";
 import { DashboardNav } from "@/components/layout/dashboard-nav";
+import { BrandLogo } from "@/components/layout/brand-logo";
 import { UsageMeter } from "@/components/usage-meter";
 import { Button } from "@/components/ui/button";
 
@@ -13,9 +13,7 @@ export default function DashboardLayout({
     <div className="min-h-screen">
       <header className="border-b border-zinc-200 dark:border-zinc-800">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-          <Link href="/dashboard" className="text-xl font-bold">
-            XQueue
-          </Link>
+          <BrandLogo href="/dashboard" />
           <form
             action={async () => {
               "use server";

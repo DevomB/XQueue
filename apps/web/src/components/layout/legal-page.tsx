@@ -28,7 +28,7 @@ export async function LegalPage({ doc, title, description }: Props) {
           <p className="text-xs font-medium uppercase tracking-widest text-sky-400">
             Legal
           </p>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight text-white">
+          <h1 className="font-display mt-2 text-3xl font-semibold tracking-tight text-white">
             {title}
           </h1>
           <p className="mt-2 text-sm text-zinc-500">{description}</p>

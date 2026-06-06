@@ -84,7 +84,7 @@ const faqs: FaqItem[] = [
   },
   {
     q: "Do I need to keep my browser or laptop open?",
-    a: "Never. Once a post is queued, a cloud worker fires at the scheduled time whether you're online, asleep, or on a plane. That's the whole point.",
+    a: "Never. Once a post is queued, XQueue publishes it at the scheduled time whether you're online, asleep, or on a plane. That's the whole point.",
   },
   {
     q: "How do you protect my account?",
@@ -130,7 +130,7 @@ export default function HomePage() {
           </Reveal>
 
           <Reveal delay={60}>
-            <h1 className="mx-auto mt-8 max-w-4xl text-5xl font-bold leading-[1.05] tracking-tight sm:text-6xl md:text-7xl">
+            <h1 className="font-display mx-auto mt-8 max-w-4xl text-5xl font-semibold leading-[1.05] tracking-tight sm:text-6xl md:text-7xl">
               Queue your posts.
               <span className="block text-beam">Publish on time, every time.</span>
             </h1>
@@ -217,13 +217,13 @@ export default function HomePage() {
               icon: CalendarClock,
               step: "02",
               title: "Set the schedule",
-              body: "Pick times in your own timezone. We store everything in UTC and publish to the exact minute.",
+              body: "Pick times in your own timezone. XQueue handles the conversions and publishes to the exact minute, wherever you are.",
             },
             {
               icon: Cloud,
               step: "03",
               title: "Close the laptop",
-              body: "A cloud worker fires each post at its time through the official X API. You don't have to be anywhere.",
+              body: "XQueue publishes each post at its time through the official X API. You don't have to be online, awake, or anywhere near a screen.",
             },
           ].map((s, i) => (
             <Reveal key={s.step} delay={i * 80}>
@@ -310,14 +310,14 @@ export default function HomePage() {
                   24<span className="text-sky-400">/</span>7
                 </>
               }
-              label="Cloud worker — runs while you sleep"
+              label="Always-on publishing — runs while you sleep"
             />
           </div>
         </Reveal>
         <p className="mt-4 text-center text-xs text-zinc-600">
           Figures describe how XQueue works, not traction claims. See{" "}
           <Link href="/security" className="text-zinc-500 underline-offset-2 hover:underline">
-            how we publish
+            how we keep you safe
           </Link>
           .
         </p>
@@ -331,7 +331,7 @@ export default function HomePage() {
               <p className="text-xs font-medium uppercase tracking-widest text-sky-400">
                 Built to be trusted
               </p>
-              <h2 className="mt-3 text-3xl font-bold tracking-tight text-white md:text-4xl">
+              <h2 className="font-display mt-3 text-3xl font-semibold tracking-tight text-white md:text-4xl">
                 Your account&apos;s safety isn&apos;t an afterthought
               </h2>
               <p className="mt-4 max-w-xl text-base leading-relaxed text-zinc-400">
@@ -409,7 +409,7 @@ export default function HomePage() {
           <div className="relative overflow-hidden rounded-3xl border border-sky-500/20 bg-linear-to-br from-sky-500/10 via-zinc-950 to-zinc-950 p-10 text-center md:p-16">
             <div className="glow-orb absolute left-1/2 top-0 h-72 w-[600px] -translate-x-1/2" />
             <div className="relative">
-              <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
+              <h2 className="font-display text-3xl font-semibold tracking-tight md:text-4xl">
                 Set it tonight. Forget it tomorrow.
               </h2>
               <p className="mx-auto mt-4 max-w-lg text-zinc-400">
@@ -479,7 +479,7 @@ function FeatureTile({
 function Stat({ value, label }: { value: React.ReactNode; label: string }) {
   return (
     <div className="bg-zinc-950 px-6 py-10 text-center">
-      <p className="text-4xl font-bold tracking-tight text-white md:text-5xl">
+      <p className="font-display text-4xl font-semibold tracking-tight text-white md:text-5xl">
         {value}
       </p>
       <p className="mx-auto mt-3 max-w-60 text-sm text-zinc-500">{label}</p>

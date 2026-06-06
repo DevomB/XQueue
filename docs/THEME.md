@@ -45,14 +45,36 @@ Backgrounds step in three depths: `#030303` (page) → `#0a0a0a` (card) →
 
 ## 4. Type & spacing
 
-- **Sans:** Geist Sans. **Mono:** Geist Mono (timestamps, code, the paste format).
-- Hero headline: `text-5xl`→`text-7xl`, `font-bold`, `tracking-tight`,
-  `leading-[1.05]`. The second line is the gradient beam.
-- Section headings: `text-3xl`→`text-4xl`, eyebrow label above in
-  `uppercase tracking-widest text-sky-400 text-xs`.
+Three faces, each with one job. Don't introduce a fourth.
+
+- **Display — Space Grotesk** (`font-display`, weight 500–700): headlines, the
+  wordmark, big stat numbers, and price figures only. Engineered and a touch
+  distinct so the brand has a recognizable voice. Always `tracking-tight`.
+- **Sans — Geist Sans** (`font-sans`, the default): all body copy, UI, labels,
+  buttons, nav. The workhorse.
+- **Mono — Geist Mono** (`font-mono`): *data* moments only — timestamps,
+  schedules, the bulk-paste preview. The contrast is what signals "automation
+  you can trust." Never use mono for prose.
+
+Apply display via the `.font-display` utility (wired to `--font-display` in
+`globals.css`), never by hardcoding the font name.
+
+- Hero headline: `font-display`, `text-5xl`→`text-7xl`, `font-semibold`,
+  `tracking-tight`, `leading-[1.05]`. The second line is the gradient beam.
+- Section headings: `font-display`, `text-3xl`→`text-4xl`, `font-semibold`,
+  eyebrow label above in `uppercase tracking-widest text-sky-400 text-xs`.
+  (Use the shared `SectionHeading` component — it already does this.)
 - Body: `text-zinc-400`, `leading-relaxed`, max width ~`max-w-2xl`.
 - Rhythm: sections `py-20`→`py-28`; content `max-w-6xl px-4`.
 - Radius: cards `rounded-2xl`, pills/buttons `rounded-xl`/`rounded-full`.
+
+## 4a. Logo & wordmark
+
+- One source of truth: the `BrandLogo` component (`components/layout/brand-logo.tsx`).
+  Use it in the header, footer, and anywhere the brand appears. Never re-hand-roll
+  the "XQ" badge.
+- The mark reads as a *queue* (stacked rows) with one signal-blue *beam* leaving
+  the stack — the post going out on schedule. Wordmark is `font-display`.
 
 ## 5. Signature visual elements
 
@@ -92,7 +114,33 @@ The product is new, so testimonials and stats are **illustrative**. Rules:
 - **Cancel anytime**, transparent link-post pricing, no lock-in.
 These live in the hero subtext, a security strip, and the FAQ.
 
-## 9. Don't
+## 9. Moat — what the site never reveals
+
+We sell the *outcome* and the *trust*, never the recipe. The public site must let
+a serious poster trust us without teaching a competitor (or an attacker) how to
+rebuild us. Hold this line on every page.
+
+**Always say (trust surface — required):**
+- We publish through the **official X API** with **OAuth** — not browser
+  automation, so your account stays safe.
+- Tokens are **encrypted at rest**; we never store your X password.
+- **Failure alerts + one-click retry**; **cancel anytime**, transparent pricing.
+
+**Never say (mechanism / moat — keep off the public site):**
+- The specific internal architecture or wording that frames us as "just a cron
+  job" — e.g. "a cloud worker fires each post," "we store everything in UTC."
+  Say "XQueue publishes at the scheduled time" and let the engine be a black box.
+- Concrete stack/vendor names (database engine, queue, hosting provider),
+  exact algorithm names + parameters, or **any environment-variable / secret
+  names**. Legal pages use plain-language equivalents ("industry-standard
+  authenticated encryption," "salted password hashing").
+- The full bulk-paste *spec*. A short teaser preview is fine as a feature demo;
+  a copy-pasteable, exhaustive format reference is not.
+
+Internal docs (`/docs`, README, deployment) can be specific. The marketing site,
+legal pages, and security page cannot.
+
+## 10. Don't
 
 - No stock-photo people, no emoji soup, no rainbow gradients, no marketing clichés.
 - No more than one accent glow per screen.

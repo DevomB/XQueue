@@ -2,21 +2,20 @@
 
 ## Data Protection
 
-- **OAuth tokens:** Encrypted at rest with AES-256-GCM using a server-side key (`TOKEN_ENCRYPTION_KEY`).
-- **Passwords:** bcrypt with cost factor 12.
-- **Transport:** TLS 1.2+ for all connections.
+- **OAuth tokens:** Encrypted at rest with strong, industry-standard authenticated encryption. Keys are held server-side and never exposed to the client.
+- **Passwords:** Stored only as salted, computationally hard hashes — we never keep your plaintext password.
+- **Transport:** All connections are encrypted with modern TLS.
 
 ## Authentication
 
-- XQueue accounts use email/password with secure session cookies.
-- X connection uses OAuth 2.0 PKCE with `state` CSRF protection.
-- Dashboard routes require authentication.
+- XQueue accounts use email/password with secure, signed session cookies.
+- Connecting your X account uses OAuth with PKCE and CSRF protection — we never see or store your X password.
+- All dashboard and account routes require authentication.
 
-## Infrastructure
+## Account Isolation
 
-- Database: PostgreSQL with row-level user isolation.
-- Job queue: Redis with authenticated connections in production.
-- Stripe webhooks verified with HMAC signatures.
+- Your posts, drafts, and tokens are isolated per account — your data is never visible to other users.
+- Scheduled jobs and webhooks are verified before they're trusted.
 
 ## Incident Response
 
@@ -24,4 +23,4 @@ Report security issues to Devom.b@yahoo.com. We aim to respond within 72 hours.
 
 ## Account Deletion
 
-Deleting your account removes scheduled posts, encrypted tokens, and cancels active Stripe subscriptions.
+Deleting your account removes your scheduled posts, encrypted tokens, and cancels any active subscription.

@@ -44,7 +44,7 @@ export default function PricingPage() {
               <p className="text-xs font-medium uppercase tracking-widest text-sky-400">
                 Pricing
               </p>
-              <h1 className="mt-3 text-4xl font-bold tracking-tight md:text-5xl">
+              <h1 className="font-display mt-3 text-4xl font-semibold tracking-tight md:text-5xl">
                 Simple, honest pricing
               </h1>
               <p className="mx-auto mt-4 max-w-lg text-zinc-400">
@@ -76,7 +76,7 @@ export default function PricingPage() {
               <p className="text-xs font-medium uppercase tracking-widest text-sky-400">
                 Pricing FAQ
               </p>
-              <h2 className="mt-3 text-3xl font-bold tracking-tight text-white md:text-4xl">
+              <h2 className="font-display mt-3 text-3xl font-semibold tracking-tight text-white md:text-4xl">
                 No surprises on your bill
               </h2>
             </div>
@@ -90,7 +90,7 @@ export default function PricingPage() {
       <section className="mx-auto max-w-6xl px-4 py-20">
         <Reveal>
           <div className="rounded-3xl border border-sky-500/20 bg-linear-to-br from-sky-500/10 to-transparent p-10 text-center md:p-14">
-            <h2 className="text-3xl font-bold tracking-tight">
+            <h2 className="font-display text-3xl font-semibold tracking-tight">
               Try it free tonight
             </h2>
             <p className="mx-auto mt-4 max-w-lg text-zinc-400">

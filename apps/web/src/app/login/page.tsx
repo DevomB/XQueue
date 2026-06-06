@@ -5,6 +5,7 @@ import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { BrandLogo } from "@/components/layout/brand-logo";
 
 const inputClass =
   "w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-2.5 text-white placeholder:text-zinc-600 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500";
@@ -42,14 +43,9 @@ export default function LoginPage() {
       <div className="grid-bg absolute inset-0 opacity-40" />
       <div className="glow-orb absolute left-1/2 top-0 h-96 w-[600px] -translate-x-1/2" />
       <div className="relative w-full max-w-md">
-        <Link href="/" className="flex items-center gap-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-sky-500 text-sm font-bold text-zinc-950">
-            XQ
-          </span>
-          <span className="text-lg font-bold text-white">XQueue</span>
-        </Link>
+        <BrandLogo />
         <div className="mt-8 rounded-2xl border border-zinc-800 bg-zinc-900/80 p-8 backdrop-blur-sm">
-          <h1 className="text-2xl font-bold text-white">Welcome back</h1>
+          <h1 className="font-display text-2xl font-semibold text-white">Welcome back</h1>
           <p className="mt-1 text-sm text-zinc-500">
             Log in to manage your scheduled posts.
           </p>

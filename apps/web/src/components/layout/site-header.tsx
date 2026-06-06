@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
+import { BrandLogo } from "@/components/layout/brand-logo";
 
 export async function SiteHeader() {
   const session = await auth();
@@ -8,14 +9,7 @@ export async function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-        <Link href="/" className="flex items-center gap-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-sky-500 text-sm font-bold text-zinc-950">
-            XQ
-          </span>
-          <span className="text-lg font-bold tracking-tight text-white">
-            XQueue
-          </span>
-        </Link>
+        <BrandLogo />
         <nav className="flex items-center gap-5 text-sm">
           <Link
             href="/#features"

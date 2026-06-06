@@ -129,7 +129,7 @@ export function PricingPlans() {
               </h2>
               <p className="mt-1 text-sm text-zinc-500">{plan.tagline}</p>
               <p className="mt-6 flex items-end gap-1">
-                <span className="text-5xl font-bold tracking-tight text-white">
+                <span className="font-display text-5xl font-semibold tracking-tight text-white">
                   ${price}
                 </span>
                 <span className="mb-1 text-zinc-500">/mo</span>
