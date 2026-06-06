@@ -8,7 +8,7 @@
 
 ## Authentication
 
-- XQueue accounts use email/password with secure, signed session cookies.
+- PostWave accounts use email/password with secure, signed session cookies.
 - Connecting your X account uses OAuth with PKCE and CSRF protection — we never see or store your X password.
 - All dashboard and account routes require authentication.
 

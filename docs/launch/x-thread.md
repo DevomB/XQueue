@@ -1,7 +1,7 @@
 # Launch X Thread
 
 **Tweet 1 (hook)**
-I built XQueue — bulk schedule X posts and close your laptop.
+I built PostWave — bulk schedule X posts and close your laptop.
 
 Paste 20 posts. Set the times. Walk away.
 
@@ -14,7 +14,7 @@ Scheduling tweets shouldn't mean:
 - Copy-pasting into native scheduler one by one
 
 **Tweet 3 (solution)**
-XQueue = bulk paste + cloud worker + official X API
+PostWave = bulk paste + cloud worker + official X API
 
 Format:
 2026-06-10 14:00 | your post here

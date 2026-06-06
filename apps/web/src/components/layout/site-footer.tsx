@@ -73,7 +73,7 @@ export function SiteFooter() {
         </div>
       </div>
       <div className="border-t border-zinc-800 py-6 text-center text-xs text-zinc-600">
-        © {new Date().getFullYear()} XQueue. Not affiliated with X Corp.
+        © {new Date().getFullYear()} PostWave. Not affiliated with X Corp.
       </div>
     </footer>
   );

@@ -1,5 +1,5 @@
 {
-  "name": "@xqueue/worker",
+  "name": "@postwave/worker",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -11,7 +11,7 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "@xqueue/shared": "workspace:*",
+    "@postwave/shared": "workspace:*",
     "@prisma/client": "^6.5.0",
     "bullmq": "^5.44.4",
     "dotenv": "^16.4.7",

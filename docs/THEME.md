@@ -1,4 +1,4 @@
-# XQueue — Website Theme & Design System
+# PostWave — Website Theme & Design System
 
 The single source of truth for the marketing site's look, voice, and intent.
 Read this before touching any marketing page so the site stays coherent.
@@ -6,7 +6,7 @@ Read this before touching any marketing page so the site stays coherent.
 ## 1. Positioning (the one-liner)
 
 **Mission control for your X presence.**
-XQueue is the calm, operator-grade scheduler for people who post on X seriously —
+PostWave is the calm, operator-grade scheduler for people who post on X seriously —
 indie founders, creators, and small teams. You batch your posts once, set the
 times, and close the laptop. The cloud worker publishes on schedule through the
 **official X API** — no browser tab, no DOM hacks, no risk to your account.
@@ -72,7 +72,7 @@ Apply display via the `.font-display` utility (wired to `--font-display` in
 
 - One source of truth: the `BrandLogo` component (`components/layout/brand-logo.tsx`).
   Use it in the header, footer, and anywhere the brand appears. Never re-hand-roll
-  the "XQ" badge.
+  the "PW" badge.
 - The mark reads as a *queue* (stacked rows) with one signal-blue *beam* leaving
   the stack — the post going out on schedule. Wordmark is `font-display`.
 
@@ -129,7 +129,7 @@ rebuild us. Hold this line on every page.
 **Never say (mechanism / moat — keep off the public site):**
 - The specific internal architecture or wording that frames us as "just a cron
   job" — e.g. "a cloud worker fires each post," "we store everything in UTC."
-  Say "XQueue publishes at the scheduled time" and let the engine be a black box.
+  Say "PostWave publishes at the scheduled time" and let the engine be a black box.
 - Concrete stack/vendor names (database engine, queue, hosting provider),
   exact algorithm names + parameters, or **any environment-variable / secret
   names**. Legal pages use plain-language equivalents ("industry-standard

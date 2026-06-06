@@ -2,7 +2,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 type BrandLogoProps = {
-  /** Render just the mark, or the mark plus the "XQueue" wordmark. */
+  /** Render just the mark, or the mark plus the "PostWave" wordmark. */
   variant?: "full" | "mark";
   /** Wrap in a link to home. Defaults to true. */
   href?: string | null;
@@ -10,7 +10,7 @@ type BrandLogoProps = {
 };
 
 /**
- * The XQueue brand lockup. One source of truth for the mark + wordmark so the
+ * The PostWave brand lockup. One source of truth for the mark + wordmark so the
  * logo stays identical in the header, footer, and anywhere else it appears.
  *
  * The mark reads as a queue (stacked rows) with one "beam" line going out —
@@ -26,7 +26,7 @@ export function BrandLogo({
       <LogoMark />
       {variant === "full" && (
         <span className="font-display text-lg font-semibold tracking-tight text-white">
-          XQueue
+          PostWave
         </span>
       )}
     </span>
@@ -35,7 +35,7 @@ export function BrandLogo({
   if (href === null) return lockup;
 
   return (
-    <Link href={href} aria-label="XQueue home" className="inline-flex">
+    <Link href={href} aria-label="PostWave home" className="inline-flex">
       {lockup}
     </Link>
   );

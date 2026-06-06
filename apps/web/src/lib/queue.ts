@@ -2,7 +2,7 @@ import { Queue } from "bullmq";
 import {
   PUBLISH_QUEUE_NAME,
   type PublishPostJobData,
-} from "@xqueue/shared";
+} from "@postwave/shared";
 
 let publishQueue: Queue | null = null;
 

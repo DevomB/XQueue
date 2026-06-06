@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { timezoneSchema } from "@xqueue/shared";
+import { timezoneSchema } from "@postwave/shared";
 
 const updateSchema = z.object({
   timezone: timezoneSchema.optional(),

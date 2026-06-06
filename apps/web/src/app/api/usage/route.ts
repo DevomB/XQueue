@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { PLAN_LIMITS } from "@xqueue/shared";
+import { PLAN_LIMITS } from "@postwave/shared";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { getUsageCounter } from "@/lib/usage";

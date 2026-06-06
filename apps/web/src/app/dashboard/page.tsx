@@ -2,7 +2,7 @@ import Link from "next/link";
 import { requireUser } from "@/lib/user";
 import { prisma } from "@/lib/db";
 import { getUsageCounter } from "@/lib/usage";
-import { PLAN_LIMITS } from "@xqueue/shared";
+import { PLAN_LIMITS } from "@postwave/shared";
 import { Button } from "@/components/ui/button";
 import { formatInTimezone } from "@/lib/utils";
 

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { isLinkPost } from "@xqueue/shared";
+import { isLinkPost } from "@postwave/shared";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { enqueuePublishJob, removePublishJob } from "@/lib/queue";

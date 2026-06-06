@@ -5,7 +5,7 @@ export default function TermsPage() {
     <LegalPage
       doc="terms.md"
       title="Terms of Service"
-      description="The rules for using XQueue. Please read before creating an account."
+      description="The rules for using PostWave. Please read before creating an account."
     />
   );
 }

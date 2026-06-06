@@ -4,7 +4,7 @@ import {
   DEAD_LETTER_QUEUE_NAME,
   PUBLISH_QUEUE_NAME,
   type PublishPostJobData,
-} from "@xqueue/shared";
+} from "@postwave/shared";
 import { processPublishJob } from "./publish-job.js";
 
 const redisUrl = process.env.REDIS_URL ?? "redis://localhost:6379";
@@ -40,7 +40,7 @@ worker.on("completed", (job) => {
   console.log(`Published post job ${job.id} completed`);
 });
 
-console.log(`XQueue worker started (concurrency: ${concurrency})`);
+console.log(`PostWave worker started (concurrency: ${concurrency})`);
 
 process.on("SIGTERM", async () => {
   await worker.close();

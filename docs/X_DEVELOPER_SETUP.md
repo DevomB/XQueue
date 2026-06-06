@@ -1,6 +1,6 @@
 # X Developer App Setup
 
-Complete these steps before XQueue can publish posts.
+Complete these steps before PostWave can publish posts.
 
 ## 1. Create a developer account
 
@@ -15,7 +15,7 @@ Complete these steps before XQueue can publish posts.
 3. Set app permissions: **Read and write**
 4. Set callback URLs:
    - `http://localhost:3000/api/x/callback` (development)
-   - `https://app.xqueue.app/api/x/callback` (production)
+   - `https://postwave.social/api/x/callback` (production)
 
 ## 3. OAuth 2.0 settings
 

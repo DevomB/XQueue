@@ -15,7 +15,7 @@ Run after local or staging deploy with real X API credentials.
 3. **Verify** `@username` shows in Settings
 4. **Schedule** a post 2 minutes ahead via Compose or bulk paste:
    ```
-   YYYY-MM-DD HH:mm | XQueue smoke test [timestamp]
+   YYYY-MM-DD HH:mm | PostWave smoke test [timestamp]
    ```
 5. **Close browser** (or open incognito — worker is independent)
 6. **Wait** 2–3 minutes

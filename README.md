@@ -1,6 +1,6 @@
-# XQueue
+# PostWave
 
-Queue and schedule X posts in bulk. Paste a batch of posts, set the times, close your browser — XQueue publishes via the official X API.
+Queue and schedule X posts in bulk. Paste a batch of posts, set the times, close your browser — PostWave publishes via the official X API.
 
 ## Stack
 

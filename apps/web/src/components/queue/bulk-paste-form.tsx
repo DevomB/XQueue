@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { isLinkPost, parseBulkPaste } from "@xqueue/shared";
+import { isLinkPost, parseBulkPaste } from "@postwave/shared";
 import { Button } from "@/components/ui/button";
 import { UrlWarning } from "@/components/url-warning";
 

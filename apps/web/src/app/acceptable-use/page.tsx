@@ -5,7 +5,7 @@ export default function AcceptableUsePage() {
     <LegalPage
       doc="acceptable-use.md"
       title="Acceptable Use Policy"
-      description="What you may and may not do with XQueue."
+      description="What you may and may not do with PostWave."
     />
   );
 }

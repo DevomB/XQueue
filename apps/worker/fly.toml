@@ -1,4 +1,4 @@
-app = "xqueue-worker"
+app = "postwave-worker"
 primary_region = "iad"
 
 [build]

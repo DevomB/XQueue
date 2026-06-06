@@ -4,7 +4,7 @@ import path from "path";
 import { randomBytes } from "crypto";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { PLAN_LIMITS } from "@xqueue/shared";
+import { PLAN_LIMITS } from "@postwave/shared";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_SIZE = 5 * 1024 * 1024;

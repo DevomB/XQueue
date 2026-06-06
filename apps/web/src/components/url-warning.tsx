@@ -1,6 +1,6 @@
 "use client";
 
-import { isLinkPost, X_API_COSTS } from "@xqueue/shared";
+import { isLinkPost, X_API_COSTS } from "@postwave/shared";
 
 export function UrlWarning({ text }: { text: string }) {
   if (!text || !isLinkPost(text)) return null;

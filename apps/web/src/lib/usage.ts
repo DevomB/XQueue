@@ -1,4 +1,4 @@
-import { PLAN_LIMITS, isLinkPost, type Plan } from "@xqueue/shared";
+import { PLAN_LIMITS, isLinkPost, type Plan } from "@postwave/shared";
 import { prisma } from "@/lib/db";
 
 export function currentMonthKey(): string {

@@ -8,8 +8,8 @@ COPY apps/web/prisma ./apps/web/prisma
 COPY apps/worker ./apps/worker
 
 RUN pnpm install --frozen-lockfile || pnpm install
-RUN pnpm --filter @xqueue/shared build
-RUN pnpm --filter @xqueue/worker build
+RUN pnpm --filter @postwave/shared build
+RUN pnpm --filter @postwave/worker build
 
 WORKDIR /app/apps/worker
 CMD ["node", "dist/index.js"]

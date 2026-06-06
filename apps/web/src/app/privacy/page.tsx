@@ -5,7 +5,7 @@ export default function PrivacyPage() {
     <LegalPage
       doc="privacy.md"
       title="Privacy Policy"
-      description="How XQueue collects, uses, and protects your data."
+      description="How PostWave collects, uses, and protects your data."
     />
   );
 }

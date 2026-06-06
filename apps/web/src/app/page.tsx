@@ -47,7 +47,7 @@ const testimonials: Testimonial[] = [
     name: "Devon Reyes",
     handle: "@devonships",
     avatar: "from-violet-500 to-fuchsia-400",
-    body: "Switched off a browser-extension scheduler that randomly died mid-day. XQueue runs on the official API so nothing breaks when I close the tab. Zero missed posts in two months.",
+      body: "Switched off a browser-extension scheduler that randomly died mid-day. PostWave runs on the official API so nothing breaks when I close the tab. Zero missed posts in two months.",
   },
   {
     name: "Priya Nair",
@@ -80,11 +80,11 @@ const testimonials: Testimonial[] = [
 const faqs: FaqItem[] = [
   {
     q: "Will this get my X account flagged or banned?",
-    a: "No. XQueue publishes through X's official API using OAuth — the same sanctioned method X provides for third-party apps. We never automate the browser, scrape, or simulate clicks, which is what gets accounts in trouble.",
+    a: "No. PostWave publishes through X's official API using OAuth — the same sanctioned method X provides for third-party apps. We never automate the browser, scrape, or simulate clicks, which is what gets accounts in trouble.",
   },
   {
     q: "Do I need to keep my browser or laptop open?",
-    a: "Never. Once a post is queued, XQueue publishes it at the scheduled time whether you're online, asleep, or on a plane. That's the whole point.",
+    a: "Never. Once a post is queued, PostWave publishes it at the scheduled time whether you're online, asleep, or on a plane. That's the whole point.",
   },
   {
     q: "How do you protect my account?",
@@ -139,7 +139,7 @@ export default function HomePage() {
           <Reveal delay={120}>
             <p className="mx-auto mt-6 max-w-2xl text-lg text-zinc-400">
               Batch a week of X posts in one sitting, set the times, and close your
-              laptop. XQueue publishes automatically through the official API —
+              laptop. PostWave publishes automatically through the official API —
               even at 2 AM, even when you&apos;re offline.
             </p>
           </Reveal>
@@ -217,13 +217,13 @@ export default function HomePage() {
               icon: CalendarClock,
               step: "02",
               title: "Set the schedule",
-              body: "Pick times in your own timezone. XQueue handles the conversions and publishes to the exact minute, wherever you are.",
+              body: "Pick times in your own timezone. PostWave handles the conversions and publishes to the exact minute, wherever you are.",
             },
             {
               icon: Cloud,
               step: "03",
-              title: "Close the laptop",
-              body: "XQueue publishes each post at its time through the official X API. You don't have to be online, awake, or anywhere near a screen.",
+          title: "Close the laptop",
+            body: "PostWave publishes each post at its time through the official X API. You don't have to be online, awake, or anywhere near a screen.",
             },
           ].map((s, i) => (
             <Reveal key={s.step} delay={i * 80}>
@@ -315,7 +315,7 @@ export default function HomePage() {
           </div>
         </Reveal>
         <p className="mt-4 text-center text-xs text-zinc-600">
-          Figures describe how XQueue works, not traction claims. See{" "}
+          Figures describe how PostWave works, not traction claims. See{" "}
           <Link href="/security" className="text-zinc-500 underline-offset-2 hover:underline">
             how we keep you safe
           </Link>
@@ -336,7 +336,7 @@ export default function HomePage() {
               </h2>
               <p className="mt-4 max-w-xl text-base leading-relaxed text-zinc-400">
                 Most schedulers cut corners with browser automation that can get
-                your account limited. XQueue does it the sanctioned way and treats
+                your account limited. PostWave does it the sanctioned way and treats
                 your credentials like they matter — because they do.
               </p>
               <Link href="/security" className="mt-6 inline-block">
@@ -376,7 +376,7 @@ export default function HomePage() {
           <SectionHeading
             eyebrow="Loved by people who ship"
             title="The quiet relief of never missing a post"
-            description="A glimpse of how founders and creators put XQueue to work."
+            description="A glimpse of how founders and creators put PostWave to work."
           />
         </Reveal>
         <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -413,7 +413,7 @@ export default function HomePage() {
                 Set it tonight. Forget it tomorrow.
               </h2>
               <p className="mx-auto mt-4 max-w-lg text-zinc-400">
-                Connect your X account, paste your posts, and let XQueue handle the
+                Connect your X account, paste your posts, and let PostWave handle the
                 clock. Start free — no card, 10 posts a month, cancel whenever.
               </p>
               <Link href="/signup" className="mt-8 inline-block">
@@ -501,7 +501,7 @@ function QueuePreview() {
         <span className="h-3 w-3 rounded-full bg-red-500/80" />
         <span className="h-3 w-3 rounded-full bg-yellow-500/80" />
         <span className="h-3 w-3 rounded-full bg-green-500/80" />
-        <span className="ml-2 font-mono text-xs text-zinc-500">xqueue · your queue</span>
+        <span className="ml-2 font-mono text-xs text-zinc-500">postwave · your queue</span>
         <span className="ml-auto flex items-center gap-1.5 text-xs text-emerald-400">
           <span className="pulse-dot h-2 w-2 rounded-full bg-emerald-400" />
           Worker live

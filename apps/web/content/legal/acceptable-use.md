@@ -2,7 +2,7 @@
 
 **Last updated:** June 5, 2026
 
-You may not use XQueue to:
+You may not use PostWave to:
 
 1. Send spam, bulk unsolicited messages, or automated replies.
 2. Post content that is illegal, harassing, hateful, or violates X's Rules.

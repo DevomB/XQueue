@@ -29,9 +29,9 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "XQueue — Schedule X posts in bulk",
+  title: "PostWave — Schedule X posts in bulk",
   description:
-    "Queue and schedule X posts in bulk. Close your browser — XQueue publishes at the right time via the official X API.",
+    "Queue and schedule X posts in bulk. Close your browser — PostWave publishes at the right time via the official X API.",
 };
 
 export default function RootLayout({

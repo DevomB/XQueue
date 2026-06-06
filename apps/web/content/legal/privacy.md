@@ -4,7 +4,7 @@
 
 ## 1. Introduction
 
-This Privacy Policy explains how XQueue ("we", "us") collects, uses, stores, and shares information when you use our website and scheduling service. By using XQueue, you agree to the practices described here.
+This Privacy Policy explains how PostWave ("we", "us") collects, uses, stores, and shares information when you use our website and scheduling service. By using PostWave, you agree to the practices described here.
 
 ## 2. Information We Collect
 
@@ -90,7 +90,7 @@ Your data may be processed in the United States or other countries where our pro
 
 ## 11. Children
 
-XQueue is not directed at children under 13. We do not knowingly collect personal information from children under 13. Contact us to request deletion if you believe we have collected such data.
+PostWave is not directed at children under 13. We do not knowingly collect personal information from children under 13. Contact us to request deletion if you believe we have collected such data.
 
 ## 12. Changes to This Policy
 

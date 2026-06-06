@@ -117,7 +117,7 @@ function SettingsContent() {
       <section className="rounded-xl border border-zinc-200 p-6 dark:border-zinc-800">
         <h2 className="font-semibold">X account</h2>
         <p className="mt-1 text-sm text-zinc-500">
-          XQueue will post on your behalf at scheduled times. You can disconnect
+          PostWave will post on your behalf at scheduled times. You can disconnect
           anytime.
         </p>
         {xAccounts.length === 0 ? (

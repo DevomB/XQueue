@@ -1,4 +1,4 @@
-# XQueue Architecture
+# PostWave Architecture
 
 ## Components
 
@@ -15,7 +15,7 @@
 
 ## Auth layers
 
-- **XQueue account:** NextAuth credentials (email/password)
+- **PostWave account:** NextAuth credentials (email/password)
 - **X connection:** OAuth 2.0 PKCE, tokens encrypted at rest
 
 ## External services

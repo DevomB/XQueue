@@ -1,15 +1,15 @@
 {
-  "name": "xqueue",
+  "name": "postwave",
   "private": true,
   "scripts": {
-    "dev": "pnpm --filter @xqueue/web dev",
-    "dev:worker": "pnpm --filter @xqueue/worker dev",
-    "build": "pnpm --filter @xqueue/shared build && pnpm --filter @xqueue/web build && pnpm --filter @xqueue/worker build",
-    "db:generate": "pnpm --filter @xqueue/web db:generate",
-    "db:migrate": "pnpm --filter @xqueue/web db:migrate",
-    "db:push": "pnpm --filter @xqueue/web db:push",
-    "db:studio": "pnpm --filter @xqueue/web db:studio",
-    "test": "pnpm --filter @xqueue/web test && pnpm --filter @xqueue/shared test",
+    "dev": "pnpm --filter @postwave/web dev",
+    "dev:worker": "pnpm --filter @postwave/worker dev",
+    "build": "pnpm --filter @postwave/shared build && pnpm --filter @postwave/web build && pnpm --filter @postwave/worker build",
+    "db:generate": "pnpm --filter @postwave/web db:generate",
+    "db:migrate": "pnpm --filter @postwave/web db:migrate",
+    "db:push": "pnpm --filter @postwave/web db:push",
+    "db:studio": "pnpm --filter @postwave/web db:studio",
+    "test": "pnpm --filter @postwave/web test && pnpm --filter @postwave/shared test",
     "lint": "pnpm -r lint"
   },
   "engines": {

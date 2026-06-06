@@ -1,10 +1,10 @@
 # Indie Hackers Post
 
-**Title:** XQueue — Schedule X posts in bulk (browser closed, official API)
+**Title:** PostWave — Schedule X posts in bulk (browser closed, official API)
 
 **Body:**
 
-Hey IH — I shipped XQueue this week.
+Hey IH — I shipped PostWave this week.
 
 **The idea:** Paste a batch of X posts with times, and a server-side worker publishes them via the official X API. Your browser can be closed.
 

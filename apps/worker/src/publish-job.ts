@@ -1,4 +1,4 @@
-import { MAX_PUBLISH_ATTEMPTS } from "@xqueue/shared";
+import { MAX_PUBLISH_ATTEMPTS } from "@postwave/shared";
 import { prisma } from "./lib/db.js";
 import { decrypt, encrypt } from "./lib/encryption.js";
 import { sendFailedPostEmail } from "./lib/email.js";

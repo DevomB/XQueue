@@ -10,7 +10,7 @@ import { Faq, type FaqItem } from "@/components/marketing/faq";
 const pricingFaqs: FaqItem[] = [
   {
     q: "Is there really a free plan?",
-    a: "Yes — 10 scheduled text posts every month, forever, no credit card. It's enough to run a light posting cadence and see exactly how XQueue works before you ever pay.",
+    a: "Yes — 10 scheduled text posts every month, forever, no credit card. It's enough to run a light posting cadence and see exactly how PostWave works before you ever pay.",
   },
   {
     q: "Why do link posts cost extra on Pro?",
