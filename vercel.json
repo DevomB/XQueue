@@ -1,0 +1,4 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "echo \"ERROR: Set Vercel Root Directory to apps/web (Project Settings → General), then redeploy.\" && exit 1"
+}

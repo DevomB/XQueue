@@ -23,13 +23,14 @@ Copy all variables from `.env.example`. Required for production:
 ## Vercel (web)
 
 1. Import repo from GitHub
-2. **Root Directory:** `apps/web` (Project Settings → General)
-3. **Output Directory:** leave empty (defaults to `.next`). Do **not** set `apps/web/.next` — that doubles the path and breaks deploys.
-4. Build/install commands are in [`apps/web/vercel.json`](apps/web/vercel.json) — no dashboard overrides needed unless you prefer manual entry:
+2. **Root Directory:** `apps/web` (Project Settings → General) — **required**. If this is left as `.` (repo root), the build finishes in ~1 second, deploys nothing, and every URL returns `404: NOT_FOUND`.
+3. **Include source files outside Root Directory:** enable (needed for `@xqueue/shared` workspace package)
+4. **Output Directory:** leave empty (defaults to `.next`). Do **not** set `apps/web/.next` — that doubles the path and breaks deploys.
+5. Build/install commands are in [`apps/web/vercel.json`](apps/web/vercel.json) — no dashboard overrides needed unless you prefer manual entry:
    - Install: `cd ../.. && pnpm install`
    - Build: `cd ../.. && pnpm --filter @xqueue/shared build && pnpm --filter @xqueue/web build`
-5. Add all env vars from `.env.example`
-6. Run `pnpm db:push` against production DB once
+6. Add all env vars from `.env.example`
+7. Run `pnpm db:push` against production DB once
 
 ## Railway (worker)
 
