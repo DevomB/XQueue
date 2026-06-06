@@ -1,0 +1,8 @@
+[build]
+builder = "NIXPACKS"
+buildCommand = "pnpm install && pnpm --filter @xqueue/shared build && pnpm --filter @xqueue/worker build"
+
+[deploy]
+startCommand = "pnpm --filter @xqueue/worker start"
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
