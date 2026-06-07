@@ -12,8 +12,8 @@ Run PostWave on your own machine or server. You provide all credentials and infr
 
 ```bash
 # 1. Clone
-git clone https://github.com/YOUR_USER/X-Post-Creator.git
-cd X-Post-Creator
+git clone https://github.com/DevomB/XQueue.git
+cd XQueue
 
 # 2. Configure
 cp .env.example .env
