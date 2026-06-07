@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postwave
+          POSTGRES_PASSWORD: postwave
+          POSTGRES_DB: postwave
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install
+
+      - name: Build shared
+        run: pnpm --filter @postwave/shared build
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Test
+        run: pnpm test
+        env:
+          DATABASE_URL: postgresql://postwave:postwave@localhost:5432/postwave
+          REDIS_URL: redis://localhost:6379
+          AUTH_SECRET: ci-test-secret-minimum-32-chars-long
+          TOKEN_ENCRYPTION_KEY: dGVzdC1rZXktMzJieXRzLWJhc2U2NC1wYWQ=
+
+      - name: Build web
+        run: pnpm --filter @postwave/web build
+        env:
+          DATABASE_URL: postgresql://postwave:postwave@localhost:5432/postwave
+          AUTH_SECRET: ci-test-secret-minimum-32-chars-long
+          TOKEN_ENCRYPTION_KEY: dGVzdC1rZXktMzJieXRzLWJhc2U2NC1wYWQ=
+
+      - name: Build worker
+        run: pnpm --filter @postwave/worker build

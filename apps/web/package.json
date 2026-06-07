@@ -15,7 +15,8 @@
     "db:migrate": "prisma migrate dev",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.8.0",
@@ -25,6 +26,7 @@
     "@postwave/shared": "workspace:*",
     "bcryptjs": "^3.0.2",
     "bullmq": "^5.44.4",
+    "ioredis": "^5.6.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
@@ -35,7 +37,6 @@
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "resend": "^4.1.2",
-    "stripe": "^17.7.0",
     "tailwind-merge": "^3.0.2",
     "zod": "^3.24.2"
   },
@@ -47,6 +48,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.7",
+    "@playwright/test": "^1.51.0",
     "prisma": "^6.5.0",
     "tailwindcss": "^4",
     "typescript": "^5",

@@ -29,9 +29,19 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "PostWave — Schedule X posts in bulk",
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
+  ),
+  title: "PostWave — Open-source bulk X scheduler",
   description:
-    "Queue and schedule X posts in bulk. Close your browser — PostWave publishes at the right time via the official X API.",
+    "Queue and schedule X posts in bulk via the official API. Self-host with Docker or deploy to your cloud.",
+  icons: { icon: "/favicon.svg" },
+  openGraph: {
+    title: "PostWave — Open-source bulk X scheduler",
+    description:
+      "Queue and schedule X posts in bulk. Self-host on Docker or AWS.",
+    images: ["/og-image.svg"],
+  },
 };
 
 export default function RootLayout({

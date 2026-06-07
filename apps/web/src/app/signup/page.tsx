@@ -14,7 +14,6 @@ export default function SignupPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -26,7 +25,7 @@ export default function SignupPage() {
     const res = await fetch("/api/auth/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password, acceptedTerms }),
+      body: JSON.stringify({ email, password }),
     });
 
     const data = await res.json();
@@ -59,16 +58,19 @@ export default function SignupPage() {
       <div className="relative w-full max-w-md">
         <BrandLogo />
         <div className="mt-8 rounded-2xl border border-zinc-800 bg-zinc-900/80 p-8 backdrop-blur-sm">
-          <h1 className="font-display text-2xl font-semibold text-white">Create your account</h1>
+          <h1 className="font-display text-2xl font-semibold text-white">
+            Create your account
+          </h1>
           <p className="mt-1 text-sm text-zinc-500">
-            10 free text posts per month. No credit card required.
+            Self-hosted scheduling for your X account.
           </p>
-          <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+          <form onSubmit={handleSubmit} className="mt-6 space-y-4" aria-live="polite">
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-zinc-300">
+              <label htmlFor="signup-email" className="mb-1.5 block text-sm font-medium text-zinc-300">
                 Email
               </label>
               <input
+                id="signup-email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -77,10 +79,11 @@ export default function SignupPage() {
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-zinc-300">
+              <label htmlFor="signup-password" className="mb-1.5 block text-sm font-medium text-zinc-300">
                 Password
               </label>
               <input
+                id="signup-password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -90,49 +93,18 @@ export default function SignupPage() {
               />
               <p className="mt-1 text-xs text-zinc-500">At least 8 characters</p>
             </div>
-            <label className="flex items-start gap-3 text-sm text-zinc-400">
-              <input
-                type="checkbox"
-                checked={acceptedTerms}
-                onChange={(e) => setAcceptedTerms(e.target.checked)}
-                className="mt-1 rounded border-zinc-600 bg-zinc-950 text-sky-500 focus:ring-sky-500"
-                required
-              />
-              <span>
-                I agree to the{" "}
-                <Link
-                  href="/terms"
-                  className="text-sky-400 hover:underline"
-                  target="_blank"
-                >
-                  Terms of Service
-                </Link>{" "}
-                and{" "}
-                <Link
-                  href="/privacy"
-                  className="text-sky-400 hover:underline"
-                  target="_blank"
-                >
-                  Privacy Policy
-                </Link>
-              </span>
-            </label>
             {error && (
-              <p className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-400">
+              <p className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-400" role="alert">
                 {error}
               </p>
             )}
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={loading || !acceptedTerms}
-            >
-              {loading ? "Creating account..." : "Start free"}
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? "Creating account..." : "Create account"}
             </Button>
           </form>
         </div>
         <ul className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-xs text-zinc-500">
-          {["Official X API", "Encrypted tokens", "Cancel anytime"].map((item) => (
+          {["Official X API", "Encrypted tokens", "Open source"].map((item) => (
             <li key={item} className="flex items-center gap-1.5">
               <span className="h-1 w-1 rounded-full bg-emerald-400" />
               {item}

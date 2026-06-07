@@ -3,10 +3,6 @@ import { isLinkPost } from "@postwave/shared";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { enqueuePublishJob } from "@/lib/queue";
-import {
-  checkCanSchedule,
-  incrementScheduledUsage,
-} from "@/lib/usage";
 import { z } from "zod";
 
 const createPostSchema = z.object({
@@ -98,21 +94,6 @@ export async function POST(request: Request) {
     );
   }
 
-  const usageCheck = await checkCanSchedule({
-    userId: user.id,
-    plan: user.plan,
-    count: status === "SCHEDULED" ? 1 : 0,
-    texts: status === "SCHEDULED" ? [parsed.data.text] : [],
-    hasMedia: mediaUrls.length > 0,
-  });
-
-  if (!usageCheck.ok) {
-    return NextResponse.json(
-      { error: usageCheck.reason, upgrade: usageCheck.upgrade },
-      { status: 403 }
-    );
-  }
-
   const post = await prisma.scheduledPost.create({
     data: {
       userId: user.id,
@@ -132,7 +113,6 @@ export async function POST(request: Request) {
       where: { id: post.id },
       data: { bullJobId: jobId },
     });
-    await incrementScheduledUsage(user.id, [parsed.data.text]);
   }
 
   return NextResponse.json({ post }, { status: 201 });
@@ -141,7 +121,6 @@ export async function POST(request: Request) {
 async function handleBulkCreate(
   user: {
     id: string;
-    plan: "FREE" | "PRO";
     timezone: string;
     xAccounts: { id: string }[];
   },
@@ -159,9 +138,6 @@ async function handleBulkCreate(
   const scheduled = parsed.data.posts.filter(
     (p) => !p.isDraft && p.scheduledAt
   );
-  const hasMedia = parsed.data.posts.some(
-    (p) => (p.mediaUrls?.length ?? 0) > 0
-  );
 
   if (scheduled.length > 0 && user.xAccounts.length === 0) {
     return NextResponse.json(
@@ -170,19 +146,14 @@ async function handleBulkCreate(
     );
   }
 
-  const usageCheck = await checkCanSchedule({
-    userId: user.id,
-    plan: user.plan,
-    count: scheduled.length,
-    texts: scheduled.map((p) => p.text),
-    hasMedia,
-  });
-
-  if (!usageCheck.ok) {
-    return NextResponse.json(
-      { error: usageCheck.reason, upgrade: usageCheck.upgrade },
-      { status: 403 }
-    );
+  for (const item of scheduled) {
+    const scheduledAt = new Date(item.scheduledAt!);
+    if (scheduledAt <= new Date()) {
+      return NextResponse.json(
+        { error: "Scheduled time must be in the future" },
+        { status: 400 }
+      );
+    }
   }
 
   const created = [];
@@ -215,13 +186,6 @@ async function handleBulkCreate(
     }
 
     created.push(post);
-  }
-
-  if (scheduled.length > 0) {
-    await incrementScheduledUsage(
-      user.id,
-      scheduled.map((p) => p.text)
-    );
   }
 
   return NextResponse.json({ posts: created }, { status: 201 });

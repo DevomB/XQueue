@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
-import { randomBytes } from "crypto";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { PLAN_LIMITS } from "@postwave/shared";
+import { storeUploadedImage } from "@/lib/storage";
+import { validateImageMagicBytes } from "@/lib/upload-validation";
+import { rateLimitRequest } from "@/lib/rate-limit";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_SIZE = 5 * 1024 * 1024;
@@ -15,15 +14,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const user = await prisma.user.findUniqueOrThrow({
+  await prisma.user.findUniqueOrThrow({
     where: { id: session.user.id },
   });
 
-  if (!PLAN_LIMITS[user.plan].mediaAllowed) {
-    return NextResponse.json(
-      { error: "Image uploads require a Pro subscription", upgrade: true },
-      { status: 403 }
-    );
+  const limited = await rateLimitRequest("upload", session.user.id, 20, 3600);
+  if (!limited.ok) {
+    return NextResponse.json({ error: limited.error }, { status: 429 });
   }
 
   const formData = await request.formData();
@@ -47,16 +44,13 @@ export async function POST(request: Request) {
     );
   }
 
-  const ext = file.type.split("/")[1] ?? "jpg";
-  const filename = `${randomBytes(16).toString("hex")}.${ext}`;
-  const uploadDir = path.join(process.cwd(), "uploads");
-  await mkdir(uploadDir, { recursive: true });
-
   const buffer = Buffer.from(await file.arrayBuffer());
-  await writeFile(path.join(uploadDir, filename), buffer);
+  const magicCheck = validateImageMagicBytes(buffer, file.type);
+  if (!magicCheck.ok) {
+    return NextResponse.json({ error: magicCheck.error }, { status: 400 });
+  }
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-  const url = `${appUrl}/api/uploads/${filename}`;
+  const url = await storeUploadedImage(buffer, file.type);
 
   return NextResponse.json({ url });
 }

@@ -2,17 +2,23 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
+import { rateLimitRequest } from "@/lib/rate-limit";
 
 const signupSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
-  acceptedTerms: z.literal(true, {
-    errorMap: () => ({ message: "You must accept the Terms and Privacy Policy" }),
-  }),
 });
 
 export async function POST(request: Request) {
   try {
+    const ip =
+      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+      "unknown";
+    const limited = await rateLimitRequest("signup", ip, 5, 3600);
+    if (!limited.ok) {
+      return NextResponse.json({ error: limited.error }, { status: 429 });
+    }
+
     const body = await request.json();
     const parsed = signupSchema.safeParse(body);
     if (!parsed.success) {
@@ -36,7 +42,6 @@ export async function POST(request: Request) {
       data: {
         email,
         passwordHash,
-        acceptedTermsAt: new Date(),
       },
     });
 

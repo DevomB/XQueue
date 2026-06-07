@@ -3,24 +3,37 @@
 import { useCallback, useEffect, useState } from "react";
 import { ComposeForm } from "@/components/compose/compose-form";
 
+function ComposeSkeleton() {
+  return (
+    <div className="animate-pulse space-y-4">
+      <div className="h-8 w-32 rounded bg-zinc-800" />
+      <div className="h-32 rounded-xl bg-zinc-900" />
+      <div className="h-10 w-40 rounded bg-zinc-800" />
+    </div>
+  );
+}
+
 export default function ComposePage() {
-  const [timezone, setTimezone] = useState("UTC");
-  const [plan, setPlan] = useState("FREE");
-  const [message, setMessage] = useState<string | null>(null);
+  const [timezone, setTimezone] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     const res = await fetch("/api/settings");
     const data = await res.json();
     setTimezone(data.timezone ?? "UTC");
-    setPlan(data.plan ?? "FREE");
   }, []);
 
   useEffect(() => {
-    // Fetch settings once on mount; state updates happen after the await,
-    // not synchronously within the effect body.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     load();
   }, [load]);
+
+  if (!timezone) {
+    return (
+      <div className="space-y-6">
+        <ComposeSkeleton />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -30,19 +43,7 @@ export default function ComposePage() {
           Write a single post or save it as a draft.
         </p>
       </div>
-      {message && (
-        <p className="rounded-lg bg-green-50 p-3 text-sm text-green-800 dark:bg-green-950 dark:text-green-200">
-          {message}
-        </p>
-      )}
-      <ComposeForm
-        timezone={timezone}
-        plan={plan}
-        onCreated={() => {
-          setMessage("Post saved successfully.");
-          setTimeout(() => setMessage(null), 3000);
-        }}
-      />
+      <ComposeForm timezone={timezone} onCreated={() => {}} />
     </div>
   );
 }

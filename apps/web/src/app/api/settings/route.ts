@@ -21,7 +21,6 @@ export async function GET() {
 
   return NextResponse.json({
     timezone: user.timezone,
-    plan: user.plan,
     xAccounts: user.xAccounts.map((a) => ({
       id: a.id,
       username: a.xUsername,

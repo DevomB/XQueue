@@ -7,11 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Plan {
-  FREE
-  PRO
-}
-
 enum PostStatus {
   DRAFT
   SCHEDULED
@@ -22,23 +17,19 @@ enum PostStatus {
 }
 
 model User {
-  id               String          @id @default(cuid())
-  email            String          @unique
-  emailVerified    DateTime?
-  name             String?
-  image            String?
-  passwordHash     String?
-  stripeCustomerId String?         @unique
-  plan             Plan            @default(FREE)
-  timezone         String          @default("UTC")
-  acceptedTermsAt  DateTime?
-  createdAt        DateTime        @default(now())
-  updatedAt        DateTime        @updatedAt
-  accounts         Account[]
-  sessions         Session[]
-  xAccounts        XAccount[]
-  scheduledPosts   ScheduledPost[]
-  usageCounters    UsageCounter[]
+  id             String          @id @default(cuid())
+  email          String          @unique
+  emailVerified  DateTime?
+  name           String?
+  image          String?
+  passwordHash   String?
+  timezone       String          @default("UTC")
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  accounts       Account[]
+  sessions       Session[]
+  xAccounts      XAccount[]
+  scheduledPosts ScheduledPost[]
 }
 
 model Account {
@@ -113,15 +104,4 @@ model ScheduledPost {
 
   @@index([userId, status])
   @@index([status, scheduledAt])
-}
-
-model UsageCounter {
-  userId          String
-  month           String
-  postsScheduled  Int    @default(0)
-  postsPublished  Int    @default(0)
-  linkPostsUsed   Int    @default(0)
-  user            User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@id([userId, month])
 }

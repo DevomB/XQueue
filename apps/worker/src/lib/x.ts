@@ -114,7 +114,7 @@ export async function uploadMediaFromUrl(
     media_id_string: string;
   };
 
-  await fetch(X_MEDIA_UPLOAD_URL, {
+  const appendRes = await fetch(X_MEDIA_UPLOAD_URL, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -128,7 +128,11 @@ export async function uploadMediaFromUrl(
     }),
   });
 
-  await fetch(X_MEDIA_UPLOAD_URL, {
+  if (!appendRes.ok) {
+    throw new Error(`Media APPEND failed: ${appendRes.status}`);
+  }
+
+  const finalizeRes = await fetch(X_MEDIA_UPLOAD_URL, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -136,6 +140,10 @@ export async function uploadMediaFromUrl(
     },
     body: new URLSearchParams({ command: "FINALIZE", media_id: mediaId }),
   });
+
+  if (!finalizeRes.ok) {
+    throw new Error(`Media FINALIZE failed: ${finalizeRes.status}`);
+  }
 
   return mediaId;
 }

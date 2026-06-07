@@ -70,8 +70,8 @@ export function BulkPasteForm({ timezone, onImported }: Props) {
       </div>
 
       {preview.length > 0 && (
-        <div className="overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-800">
-          <table className="w-full text-left text-sm">
+        <div className="overflow-x-auto rounded-lg border border-zinc-200 dark:border-zinc-800">
+          <table className="w-full min-w-[480px] text-left text-sm">
             <thead className="bg-zinc-50 dark:bg-zinc-900">
               <tr>
                 <th className="px-3 py-2">#</th>

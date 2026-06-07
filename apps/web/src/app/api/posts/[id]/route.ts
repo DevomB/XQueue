@@ -58,6 +58,32 @@ export async function PATCH(
   const status = parsed.data.status ?? post.status;
   const mediaUrls = parsed.data.mediaUrls ?? post.mediaUrls;
 
+  if (status === "SCHEDULED") {
+    if (!scheduledAt) {
+      return NextResponse.json(
+        { error: "scheduledAt required for scheduled posts" },
+        { status: 400 }
+      );
+    }
+    if (scheduledAt <= new Date()) {
+      return NextResponse.json(
+        { error: "Scheduled time must be in the future" },
+        { status: 400 }
+      );
+    }
+
+    const xAccounts = await prisma.xAccount.findMany({
+      where: { userId: session.user.id },
+      take: 1,
+    });
+    if (xAccounts.length === 0) {
+      return NextResponse.json(
+        { error: "Connect an X account before scheduling posts" },
+        { status: 400 }
+      );
+    }
+  }
+
   const updated = await prisma.scheduledPost.update({
     where: { id },
     data: {
@@ -68,6 +94,15 @@ export async function PATCH(
       isLinkPost: isLinkPost(text),
       bullJobId: null,
       failureReason: status === "CANCELLED" ? null : post.failureReason,
+      ...(status === "SCHEDULED"
+        ? {
+            xAccountId: (
+              await prisma.xAccount.findFirst({
+                where: { userId: session.user.id },
+              })
+            )?.id,
+          }
+        : {}),
     },
   });
 

@@ -11,11 +11,6 @@ import {
   uploadMediaFromUrl,
 } from "./lib/x.js";
 
-function currentMonthKey(): string {
-  const now = new Date();
-  return `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, "0")}`;
-}
-
 async function getValidAccessToken(xAccountId: string): Promise<string> {
   const account = await prisma.xAccount.findUniqueOrThrow({
     where: { id: xAccountId },
@@ -79,45 +74,7 @@ export async function processPublishJob(scheduledPostId: string): Promise<void> 
   }
 
   try {
-    const accessToken = await getValidAccessToken(locked.xAccountId);
-
-    let mediaIds: string[] | undefined;
-    if (locked.mediaUrls.length > 0) {
-      mediaIds = [];
-      for (const url of locked.mediaUrls) {
-        const mediaId = await uploadMediaFromUrl(accessToken, url);
-        mediaIds.push(mediaId);
-      }
-    }
-
-    const result = await createTweet(accessToken, locked.text, mediaIds);
-
-    await prisma.scheduledPost.update({
-      where: { id: scheduledPostId },
-      data: {
-        status: "PUBLISHED",
-        xTweetId: result.data.id,
-        publishedAt: new Date(),
-        failureReason: null,
-      },
-    });
-
-    const month = currentMonthKey();
-    await prisma.usageCounter.upsert({
-      where: {
-        userId_month: { userId: locked.userId, month },
-      },
-      create: {
-        userId: locked.userId,
-        month,
-        postsPublished: 1,
-        linkPostsUsed: locked.isLinkPost ? 1 : 0,
-      },
-      update: {
-        postsPublished: { increment: 1 },
-        ...(locked.isLinkPost ? { linkPostsUsed: { increment: 1 } } : {}),
-      },
-    });
+    await publishWithToken(scheduledPostId, locked.xAccountId, locked);
   } catch (err) {
     const status = (err as Error & { status?: number }).status;
     const message = err instanceof Error ? err.message : "Unknown error";
@@ -126,8 +83,17 @@ export async function processPublishJob(scheduledPostId: string): Promise<void> 
       include: { user: true },
     });
 
-    if (status === 401) {
-      throw err;
+    if (status === 401 && locked.xAccountId) {
+      try {
+        await getValidAccessToken(locked.xAccountId);
+        await publishWithToken(scheduledPostId, locked.xAccountId, locked);
+        return;
+      } catch (retryErr) {
+        const retryMessage =
+          retryErr instanceof Error ? retryErr.message : "Token refresh failed";
+        await markFailed(scheduledPostId, post.user.email, post.text, retryMessage);
+        return;
+      }
     }
 
     if (isRetryableStatus(status ?? 0) && post.attemptCount < MAX_PUBLISH_ATTEMPTS) {
@@ -140,6 +106,38 @@ export async function processPublishJob(scheduledPostId: string): Promise<void> 
 
     await markFailed(scheduledPostId, post.user.email, post.text, message);
   }
+}
+
+async function publishWithToken(
+  scheduledPostId: string,
+  xAccountId: string,
+  locked: {
+    text: string;
+    mediaUrls: string[];
+  }
+) {
+  const accessToken = await getValidAccessToken(xAccountId);
+
+  let mediaIds: string[] | undefined;
+  if (locked.mediaUrls.length > 0) {
+    mediaIds = [];
+    for (const url of locked.mediaUrls) {
+      const mediaId = await uploadMediaFromUrl(accessToken, url);
+      mediaIds.push(mediaId);
+    }
+  }
+
+  const result = await createTweet(accessToken, locked.text, mediaIds);
+
+  await prisma.scheduledPost.update({
+    where: { id: scheduledPostId },
+    data: {
+      status: "PUBLISHED",
+      xTweetId: result.data.id,
+      publishedAt: new Date(),
+      failureReason: null,
+    },
+  });
 }
 
 async function markFailed(

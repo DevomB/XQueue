@@ -1,7 +1,6 @@
 import { signOut } from "@/lib/auth";
 import { DashboardNav } from "@/components/layout/dashboard-nav";
 import { BrandLogo } from "@/components/layout/brand-logo";
-import { UsageMeter } from "@/components/usage-meter";
 import { Button } from "@/components/ui/button";
 
 export default function DashboardLayout({
@@ -27,9 +26,8 @@ export default function DashboardLayout({
         </div>
       </header>
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-8 md:grid-cols-[220px_1fr]">
-        <aside className="space-y-6">
+        <aside>
           <DashboardNav />
-          <UsageMeter />
         </aside>
         <main>{children}</main>
       </div>

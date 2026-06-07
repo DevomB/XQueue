@@ -1,0 +1,4 @@
+aws_region     = "us-east-1"
+project_name   = "postwave"
+s3_bucket_name = "your-unique-postwave-uploads"
+db_password    = "CHANGE_ME_STRONG_PASSWORD"

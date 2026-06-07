@@ -1,24 +1,4 @@
-export const PLANS = {
-  FREE: "FREE",
-  PRO: "PRO",
-} as const;
-
-export type Plan = (typeof PLANS)[keyof typeof PLANS];
-
-export const PLAN_LIMITS = {
-  FREE: {
-    postsPerMonth: 10,
-    linkPostsPerMonth: 0,
-    mediaAllowed: false,
-    maxImagesPerPost: 0,
-  },
-  PRO: {
-    postsPerMonth: 150,
-    linkPostsPerMonth: 30,
-    mediaAllowed: true,
-    maxImagesPerPost: 4,
-  },
-} as const;
+export const MAX_IMAGES_PER_POST = 4;
 
 export const X_API_COSTS = {
   textPostUsd: 0.015,

@@ -1,25 +1,29 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/user";
 import { prisma } from "@/lib/db";
-import { getUsageCounter } from "@/lib/usage";
-import { PLAN_LIMITS } from "@postwave/shared";
 import { Button } from "@/components/ui/button";
 import { formatInTimezone } from "@/lib/utils";
 
 export default async function DashboardPage() {
   const user = await requireUser();
-  const usage = await getUsageCounter(user.id);
-  const limits = PLAN_LIMITS[user.plan];
 
-  const upcoming = await prisma.scheduledPost.findMany({
-    where: {
-      userId: user.id,
-      status: "SCHEDULED",
-      scheduledAt: { gte: new Date() },
-    },
-    orderBy: { scheduledAt: "asc" },
-    take: 5,
-  });
+  const [upcoming, publishedCount, scheduledCount] = await Promise.all([
+    prisma.scheduledPost.findMany({
+      where: {
+        userId: user.id,
+        status: "SCHEDULED",
+        scheduledAt: { gte: new Date() },
+      },
+      orderBy: { scheduledAt: "asc" },
+      take: 5,
+    }),
+    prisma.scheduledPost.count({
+      where: { userId: user.id, status: "PUBLISHED" },
+    }),
+    prisma.scheduledPost.count({
+      where: { userId: user.id, status: "SCHEDULED" },
+    }),
+  ]);
 
   const xConnected = user.xAccounts.length > 0;
 
@@ -44,11 +48,8 @@ export default async function DashboardPage() {
       )}
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <Stat
-          label="Posts this month"
-          value={`${usage.postsScheduled + usage.postsPublished} / ${limits.postsPerMonth}`}
-        />
-        <Stat label="Plan" value={user.plan} />
+        <Stat label="Scheduled" value={String(scheduledCount)} />
+        <Stat label="Published" value={String(publishedCount)} />
         <Stat
           label="X account"
           value={xConnected ? `@${user.xAccounts[0].xUsername}` : "Not connected"}
