@@ -1,7 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import { ComposeForm } from "@/components/compose/compose-form";
+
+type SettingsData = {
+  timezone: string;
+  xAccounts: { id: string; username: string }[];
+};
 
 function ComposeSkeleton() {
   return (
@@ -14,12 +20,16 @@ function ComposeSkeleton() {
 }
 
 export default function ComposePage() {
-  const [timezone, setTimezone] = useState<string | null>(null);
+  const [settings, setSettings] = useState<SettingsData | null>(null);
+  const [createdId, setCreatedId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     const res = await fetch("/api/settings");
     const data = await res.json();
-    setTimezone(data.timezone ?? "UTC");
+    setSettings({
+      timezone: data.timezone ?? "UTC",
+      xAccounts: data.xAccounts ?? [],
+    });
   }, []);
 
   useEffect(() => {
@@ -27,7 +37,7 @@ export default function ComposePage() {
     load();
   }, [load]);
 
-  if (!timezone) {
+  if (!settings) {
     return (
       <div className="space-y-6">
         <ComposeSkeleton />
@@ -43,7 +53,25 @@ export default function ComposePage() {
           Write a single post or save it as a draft.
         </p>
       </div>
-      <ComposeForm timezone={timezone} onCreated={() => {}} />
+
+      {createdId && (
+        <div className="rounded-lg border border-emerald-800 bg-emerald-950/50 p-4 text-sm text-emerald-200">
+          Post created.{" "}
+          <Link
+            href={`/dashboard/queue?highlight=${createdId}`}
+            className="underline"
+          >
+            View in queue
+          </Link>
+        </div>
+      )}
+
+      <ComposeForm
+        timezone={settings.timezone}
+        username={settings.xAccounts[0]?.username}
+        xAccounts={settings.xAccounts}
+        onCreated={(id) => setCreatedId(id)}
+      />
     </div>
   );
 }

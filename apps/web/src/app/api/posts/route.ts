@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 import { isLinkPost } from "@postwave/shared";
 import { auth } from "@/lib/auth";
+import { apiError, withApiHandler } from "@/lib/api-utils";
 import { prisma } from "@/lib/db";
 import { enqueuePublishJob } from "@/lib/queue";
+import { rateLimitRequest } from "@/lib/rate-limit";
 import { z } from "zod";
 
 const createPostSchema = z.object({
@@ -11,6 +13,7 @@ const createPostSchema = z.object({
   timezone: z.string().optional(),
   mediaUrls: z.array(z.string().url()).max(4).optional(),
   status: z.enum(["DRAFT", "SCHEDULED"]).optional(),
+  xAccountId: z.string().optional(),
 });
 
 const bulkCreateSchema = z.object({
@@ -25,97 +28,124 @@ const bulkCreateSchema = z.object({
   timezone: z.string().optional(),
 });
 
-export async function GET() {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+async function schedulePost(
+  postId: string,
+  scheduledAt: Date
+): Promise<string> {
+  try {
+    const jobId = await enqueuePublishJob(postId, scheduledAt);
+    await prisma.scheduledPost.update({
+      where: { id: postId },
+      data: { bullJobId: jobId },
+    });
+    return jobId;
+  } catch {
+    await prisma.scheduledPost.update({
+      where: { id: postId },
+      data: { status: "DRAFT", scheduledAt: null, bullJobId: null },
+    });
+    throw new Error("Queue unavailable; post saved as draft. Try scheduling again.");
   }
+}
 
-  const posts = await prisma.scheduledPost.findMany({
-    where: { userId: session.user.id },
-    orderBy: [{ scheduledAt: "asc" }, { createdAt: "desc" }],
+export async function GET() {
+  return withApiHandler(async () => {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return apiError("Unauthorized", 401);
+    }
+
+    const posts = await prisma.scheduledPost.findMany({
+      where: { userId: session.user.id },
+      orderBy: [{ scheduledAt: "asc" }, { createdAt: "desc" }],
+    });
+
+    return NextResponse.json({ posts });
   });
-
-  return NextResponse.json({ posts });
 }
 
 export async function POST(request: Request) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  return withApiHandler(async () => {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return apiError("Unauthorized", 401);
+    }
 
-  const user = await prisma.user.findUniqueOrThrow({
-    where: { id: session.user.id },
-    include: { xAccounts: { take: 1 } },
-  });
+    const rl = await rateLimitRequest("posts", session.user.id, 60, 3600);
+    if (!rl.ok) return apiError(rl.error, 429);
 
-  const body = await request.json();
-
-  if (body.posts) {
-    return handleBulkCreate(user, body);
-  }
-
-  const parsed = createPostSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.errors[0]?.message },
-      { status: 400 }
-    );
-  }
-
-  const timezone = parsed.data.timezone ?? user.timezone;
-  const mediaUrls = parsed.data.mediaUrls ?? [];
-  const scheduledAt = parsed.data.scheduledAt
-    ? new Date(parsed.data.scheduledAt)
-    : undefined;
-  const status =
-    parsed.data.status ??
-    (scheduledAt ? "SCHEDULED" : "DRAFT");
-
-  if (status === "SCHEDULED" && !scheduledAt) {
-    return NextResponse.json(
-      { error: "scheduledAt required for scheduled posts" },
-      { status: 400 }
-    );
-  }
-
-  if (status === "SCHEDULED" && scheduledAt! <= new Date()) {
-    return NextResponse.json(
-      { error: "Scheduled time must be in the future" },
-      { status: 400 }
-    );
-  }
-
-  if (status === "SCHEDULED" && user.xAccounts.length === 0) {
-    return NextResponse.json(
-      { error: "Connect an X account before scheduling posts" },
-      { status: 400 }
-    );
-  }
-
-  const post = await prisma.scheduledPost.create({
-    data: {
-      userId: user.id,
-      xAccountId: user.xAccounts[0]?.id,
-      text: parsed.data.text,
-      scheduledAt,
-      timezone,
-      status,
-      mediaUrls,
-      isLinkPost: isLinkPost(parsed.data.text),
-    },
-  });
-
-  if (status === "SCHEDULED" && scheduledAt) {
-    const jobId = await enqueuePublishJob(post.id, scheduledAt);
-    await prisma.scheduledPost.update({
-      where: { id: post.id },
-      data: { bullJobId: jobId },
+    const user = await prisma.user.findUniqueOrThrow({
+      where: { id: session.user.id },
+      include: { xAccounts: true },
     });
-  }
 
-  return NextResponse.json({ post }, { status: 201 });
+    const body = await request.json();
+
+    if (body.posts) {
+      return handleBulkCreate(user, body);
+    }
+
+    const parsed = createPostSchema.safeParse(body);
+    if (!parsed.success) {
+      return apiError(parsed.error.errors[0]?.message ?? "Invalid input", 400);
+    }
+
+    const timezone = parsed.data.timezone ?? user.timezone;
+    const mediaUrls = parsed.data.mediaUrls ?? [];
+    const scheduledAt = parsed.data.scheduledAt
+      ? new Date(parsed.data.scheduledAt)
+      : undefined;
+    const status =
+      parsed.data.status ?? (scheduledAt ? "SCHEDULED" : "DRAFT");
+
+    if (status === "SCHEDULED" && !scheduledAt) {
+      return apiError("scheduledAt required for scheduled posts", 400);
+    }
+
+    if (status === "SCHEDULED" && scheduledAt! <= new Date()) {
+      return apiError("Scheduled time must be in the future", 400);
+    }
+
+    if (status === "SCHEDULED" && user.xAccounts.length === 0) {
+      return apiError("Connect an X account before scheduling posts", 400);
+    }
+
+    const xAccountId =
+      parsed.data.xAccountId &&
+      user.xAccounts.some((a) => a.id === parsed.data.xAccountId)
+        ? parsed.data.xAccountId
+        : user.xAccounts[0]?.id;
+
+    const post = await prisma.scheduledPost.create({
+      data: {
+        userId: user.id,
+        xAccountId,
+        text: parsed.data.text,
+        scheduledAt,
+        timezone,
+        status,
+        mediaUrls,
+        isLinkPost: isLinkPost(parsed.data.text),
+      },
+    });
+
+    if (status === "SCHEDULED" && scheduledAt) {
+      try {
+        await schedulePost(post.id, scheduledAt);
+      } catch (err) {
+        return apiError(
+          err instanceof Error ? err.message : "Queue unavailable",
+          503
+        );
+      }
+    }
+
+    const updated = await prisma.scheduledPost.findUniqueOrThrow({
+      where: { id: post.id },
+    });
+
+    return NextResponse.json({ post: updated }, { status: 201 });
+  });
 }
 
 async function handleBulkCreate(
@@ -128,10 +158,7 @@ async function handleBulkCreate(
 ) {
   const parsed = bulkCreateSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.errors[0]?.message },
-      { status: 400 }
-    );
+    return apiError(parsed.error.errors[0]?.message ?? "Invalid input", 400);
   }
 
   const timezone = parsed.data.timezone ?? user.timezone;
@@ -140,19 +167,13 @@ async function handleBulkCreate(
   );
 
   if (scheduled.length > 0 && user.xAccounts.length === 0) {
-    return NextResponse.json(
-      { error: "Connect an X account before scheduling posts" },
-      { status: 400 }
-    );
+    return apiError("Connect an X account before scheduling posts", 400);
   }
 
   for (const item of scheduled) {
     const scheduledAt = new Date(item.scheduledAt!);
     if (scheduledAt <= new Date()) {
-      return NextResponse.json(
-        { error: "Scheduled time must be in the future" },
-        { status: 400 }
-      );
+      return apiError("Scheduled time must be in the future", 400);
     }
   }
 
@@ -161,8 +182,7 @@ async function handleBulkCreate(
     const scheduledAt = item.scheduledAt
       ? new Date(item.scheduledAt)
       : undefined;
-    const status =
-      item.isDraft || !scheduledAt ? "DRAFT" : "SCHEDULED";
+    const status = item.isDraft || !scheduledAt ? "DRAFT" : "SCHEDULED";
 
     const post = await prisma.scheduledPost.create({
       data: {
@@ -178,14 +198,20 @@ async function handleBulkCreate(
     });
 
     if (status === "SCHEDULED" && scheduledAt) {
-      const jobId = await enqueuePublishJob(post.id, scheduledAt);
-      await prisma.scheduledPost.update({
-        where: { id: post.id },
-        data: { bullJobId: jobId },
-      });
+      try {
+        await schedulePost(post.id, scheduledAt);
+      } catch (err) {
+        return apiError(
+          err instanceof Error ? err.message : "Queue unavailable during bulk import",
+          503
+        );
+      }
     }
 
-    created.push(post);
+    const updated = await prisma.scheduledPost.findUniqueOrThrow({
+      where: { id: post.id },
+    });
+    created.push(updated);
   }
 
   return NextResponse.json({ posts: created }, { status: 201 });

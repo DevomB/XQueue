@@ -50,6 +50,22 @@ describe("parseBulkPaste", () => {
     expect(result[0].error).toMatch(/Invalid date/i);
   });
 
+  it("handles America/New_York timezone offset", () => {
+    const future = new Date();
+    future.setDate(future.getDate() + 2);
+    const date = future.toISOString().slice(0, 10);
+    const result = parseBulkPaste(`${date} 09:00 | TZ test`, "America/New_York");
+    expect(result[0].error).toBeUndefined();
+    expect(result[0].scheduledAt).toBeInstanceOf(Date);
+  });
+
+  it("returns error for invalid IANA timezone", () => {
+    const future = new Date();
+    future.setDate(future.getDate() + 1);
+    const date = future.toISOString().slice(0, 10);
+    expect(() => parseBulkPaste(`${date} 09:00 | Hello`, "Not/A/Zone")).toThrow();
+  });
+
   it("parses multiple lines", () => {
     const future = new Date();
     future.setDate(future.getDate() + 1);

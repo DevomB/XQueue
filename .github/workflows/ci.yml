@@ -65,3 +65,16 @@ jobs:
 
       - name: Build worker
         run: pnpm --filter @postwave/worker build
+
+      - name: Install Playwright browsers
+        run: pnpm --filter @postwave/web exec playwright install chromium
+
+      - name: Prepare database for E2E
+        run: pnpm db:push
+        env:
+          DATABASE_URL: postgresql://postwave:postwave@localhost:5432/postwave
+
+      - name: E2E smoke tests
+        run: pnpm --filter @postwave/web test:e2e
+        env:
+          PLAYWRIGHT_BASE_URL: http://localhost:3000

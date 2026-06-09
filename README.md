@@ -106,4 +106,4 @@ Software provided **AS IS** without warranty. You operate your own instance and 
 
 Sample posts for GitHub/X: [docs/SHOWCASE.md](docs/SHOWCASE.md)
 
-<!-- Screenshot: add docs/screenshot.png when available -->
+![PostWave dashboard](docs/screenshot.svg)

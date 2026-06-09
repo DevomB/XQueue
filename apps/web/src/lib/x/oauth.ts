@@ -148,10 +148,28 @@ export async function fetchXUser(accessToken: string): Promise<XUserResponse> {
   return response.json() as Promise<XUserResponse>;
 }
 
-export function tokenExpiresAt(expiresInSeconds: number): Date {
-  return new Date(Date.now() + expiresInSeconds * 1000);
-}
+export { needsTokenRefresh, tokenExpiresAt } from "@postwave/shared";
 
-export function needsTokenRefresh(expiresAt: Date, bufferMinutes = 5): boolean {
-  return expiresAt.getTime() <= Date.now() + bufferMinutes * 60 * 1000;
+export async function revokeAccessToken(token: string): Promise<void> {
+  const clientId = process.env.X_CLIENT_ID;
+  const clientSecret = process.env.X_CLIENT_SECRET;
+  if (!clientId || !clientSecret) return;
+
+  const basicAuth = Buffer.from(`${clientId}:${clientSecret}`).toString(
+    "base64"
+  );
+
+  const body = new URLSearchParams({
+    token,
+    token_type_hint: "access_token",
+  });
+
+  await fetch("https://api.x.com/2/oauth2/revoke", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      Authorization: `Basic ${basicAuth}`,
+    },
+    body,
+  }).catch(() => null);
 }

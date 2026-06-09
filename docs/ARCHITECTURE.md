@@ -13,6 +13,20 @@
 3. Worker picks up job → refreshes OAuth token if needed → `POST /2/tweets`
 4. Worker updates status to `PUBLISHED` or `FAILED` (+ email on failure via Resend)
 
+## Post status lifecycle
+
+`DRAFT` → `SCHEDULED` → `QUEUED` (worker lock) → `PUBLISHED` | `FAILED` | `CANCELLED`
+
+- **QUEUED recovery:** If a worker crashes mid-publish, a cron resets stale `QUEUED` posts (default 10 min) back to `SCHEDULED` and re-enqueues.
+- **Dead-letter queue:** After BullMQ max retries, jobs land in `publish-post-dlq`; a DLQ worker marks posts `FAILED` with the error reason.
+
+## Media URL reachability
+
+The worker fetches `mediaUrls` at publish time. In production:
+
+- **S3:** Use a bucket URL the worker can reach (public object or presigned GET). Configure CORS if needed.
+- **Local storage:** Signed URLs (`/api/uploads/{file}?sig=...`) must be reachable from the worker process at `NEXT_PUBLIC_APP_URL`.
+
 ## Auth layers
 
 - **PostWave account:** NextAuth credentials (email/password, bcrypt)

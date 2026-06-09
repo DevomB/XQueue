@@ -35,13 +35,38 @@ See [`railway.toml`](../railway.toml) and [`apps/worker/fly.toml`](../apps/worke
 
 Worker needs: `DATABASE_URL`, `REDIS_URL`, `TOKEN_ENCRYPTION_KEY`, X credentials, `NEXT_PUBLIC_APP_URL`.
 
-## AWS (full stack)
+## S3 image storage (production)
 
-Terraform template in [`infra/deploy/aws/`](../infra/deploy/aws/README.md) deploys into **your AWS account**:
-- RDS PostgreSQL
-- ElastiCache Redis
-- ECS Fargate (web + worker)
-- S3 for image uploads
+When `STORAGE_TYPE=s3`:
+
+1. Create a bucket (or use Terraform in `infra/deploy/aws/` — S3 only today).
+2. Set `S3_BUCKET`, `S3_REGION`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, and `S3_PUBLIC_URL` (base URL workers use to fetch images).
+3. Configure bucket CORS if the web app uploads from the browser:
+
+```json
+[
+  {
+    "AllowedHeaders": ["*"],
+    "AllowedMethods": ["PUT", "GET"],
+    "AllowedOrigins": ["https://your-app.example.com"],
+    "ExposeHeaders": []
+  }
+]
+```
+
+4. Ensure the worker can `GET` uploaded objects at the URLs stored in `mediaUrls`.
+
+## AWS (partial Terraform)
+
+Terraform in [`infra/deploy/aws/`](../infra/deploy/aws/README.md) currently creates an **S3 uploads bucket** only. RDS, ElastiCache, and ECS are planned — deploy Postgres/Redis via Neon, Upstash, or Docker until then.
+
+## One-command Docker (optional)
+
+```bash
+docker compose --profile full up -d   # postgres + redis + web + worker
+```
+
+Requires `.env` configured. Default `docker compose up -d` starts Postgres and Redis only.
 
 ## Post-deploy checklist
 

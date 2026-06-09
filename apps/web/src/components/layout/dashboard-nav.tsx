@@ -23,8 +23,8 @@ export function DashboardNav() {
           className={cn(
             "rounded-lg px-3 py-2 text-sm font-medium transition-colors",
             pathname === link.href
-              ? "bg-zinc-900 text-white dark:bg-white dark:text-zinc-900"
-              : "text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+              ? "bg-sky-500/15 text-sky-400"
+              : "text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"
           )}
         >
           {link.label}

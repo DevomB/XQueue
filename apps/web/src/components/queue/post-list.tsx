@@ -1,8 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { ExternalLink, ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { UrlWarning } from "@/components/url-warning";
+import { useToast } from "@/components/ui/toast";
 
 export type PostItem = {
   id: string;
@@ -11,12 +16,16 @@ export type PostItem = {
   status: string;
   failureReason: string | null;
   isLinkPost: boolean;
+  mediaUrls: string[];
+  xTweetId: string | null;
+  publishedAt: string | null;
 };
 
 type Props = {
   posts: PostItem[];
   onRefresh: () => void;
   filter?: string;
+  highlightId?: string;
 };
 
 function toDatetimeLocalValue(iso: string | null): string {
@@ -26,16 +35,25 @@ function toDatetimeLocalValue(iso: string | null): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
-export function PostList({ posts, onRefresh, filter }: Props) {
+export function PostList({ posts, onRefresh, filter, highlightId }: Props) {
+  const { toast } = useToast();
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
   const [editSchedule, setEditSchedule] = useState("");
   const [actionError, setActionError] = useState<string | null>(null);
+  const [confirm, setConfirm] = useState<{
+    title: string;
+    message: string;
+    action: () => void;
+  } | null>(null);
+  const refs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  const filtered = filter
-    ? posts.filter((p) => p.status === filter)
-    : posts;
+  const filtered = filter ? posts.filter((p) => p.status === filter) : posts;
+
+  if (highlightId && refs.current[highlightId]) {
+    refs.current[highlightId]?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
 
   async function apiAction(
     id: string,
@@ -47,9 +65,12 @@ export function PostList({ posts, onRefresh, filter }: Props) {
     const data = await res.json().catch(() => ({}));
     setLoadingId(null);
     if (!res.ok) {
-      setActionError(data.error ?? "Action failed");
+      const msg = data.error ?? "Action failed";
+      setActionError(msg);
+      toast(msg, "error");
       return false;
     }
+    toast("Done", "success");
     onRefresh();
     return true;
   }
@@ -92,6 +113,25 @@ export function PostList({ posts, onRefresh, filter }: Props) {
     if (ok) setEditingId(null);
   }
 
+  async function duplicatePost(post: PostItem) {
+    const res = await fetch("/api/posts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        text: post.text,
+        mediaUrls: post.mediaUrls,
+        status: "DRAFT",
+      }),
+    });
+    if (res.ok) {
+      toast("Post duplicated as draft", "success");
+      onRefresh();
+    } else {
+      const data = await res.json();
+      toast(data.error ?? "Duplicate failed", "error");
+    }
+  }
+
   if (filtered.length === 0) {
     return (
       <p className="text-sm text-zinc-500">No posts in this view yet.</p>
@@ -100,30 +140,53 @@ export function PostList({ posts, onRefresh, filter }: Props) {
 
   return (
     <div className="space-y-3" aria-live="polite">
+      <ConfirmDialog
+        open={confirm !== null}
+        title={confirm?.title ?? ""}
+        message={confirm?.message ?? ""}
+        danger
+        confirmLabel="Delete"
+        onConfirm={() => {
+          confirm?.action();
+          setConfirm(null);
+        }}
+        onCancel={() => setConfirm(null)}
+      />
+
       {actionError && (
-        <p className="rounded-lg bg-red-50 p-3 text-sm text-red-600 dark:bg-red-950 dark:text-red-400" role="alert">
+        <p
+          className="rounded-lg bg-red-50 p-3 text-sm text-red-600 dark:bg-red-950 dark:text-red-400"
+          role="alert"
+        >
           {actionError}
         </p>
       )}
       {filtered.map((post) => (
         <div
           key={post.id}
-          className="rounded-xl border border-zinc-200 p-4 dark:border-zinc-800"
+          ref={(el) => {
+            refs.current[post.id] = el;
+          }}
+          className={`rounded-xl border p-4 ${
+            highlightId === post.id
+              ? "border-sky-500 bg-sky-950/20"
+              : "border-zinc-200 dark:border-zinc-800"
+          }`}
         >
           {editingId === post.id ? (
             <div className="space-y-3">
-              <textarea
+              <Textarea
                 value={editText}
                 onChange={(e) => setEditText(e.target.value)}
                 maxLength={280}
-                className="min-h-[80px] w-full rounded-lg border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+                className="min-h-[80px]"
               />
+              <p className="text-xs text-zinc-500">{editText.length}/280</p>
               <UrlWarning text={editText} />
-              <input
+              <Input
                 type="datetime-local"
                 value={editSchedule}
                 onChange={(e) => setEditSchedule(e.target.value)}
-                className="w-full rounded-lg border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
               />
               <div className="flex flex-wrap gap-2">
                 <Button
@@ -156,21 +219,68 @@ export function PostList({ posts, onRefresh, filter }: Props) {
             <>
               <div className="mb-2 flex items-start justify-between gap-4">
                 <p className="text-sm whitespace-pre-wrap">{post.text}</p>
-                <span className="shrink-0 rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium dark:bg-zinc-800">
-                  {post.status}
+                <span
+                  className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${
+                    post.status === "QUEUED"
+                      ? "bg-sky-900 text-sky-300"
+                      : post.status === "FAILED"
+                        ? "bg-red-900 text-red-300"
+                        : "bg-zinc-100 dark:bg-zinc-800"
+                  }`}
+                >
+                  {post.status === "QUEUED" ? "Publishing…" : post.status}
                 </span>
               </div>
+
+              {post.mediaUrls.length > 0 && (
+                <div className="mb-2 flex flex-wrap gap-2">
+                  {post.mediaUrls.map((url) => (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      key={url}
+                      src={url}
+                      alt=""
+                      className="h-16 max-h-16 rounded-lg border border-zinc-700 object-cover"
+                    />
+                  ))}
+                </div>
+              )}
+
               <div className="flex flex-wrap items-center gap-2 text-xs text-zinc-500">
                 {post.scheduledAt && (
                   <span>{new Date(post.scheduledAt).toLocaleString()}</span>
+                )}
+                {post.mediaUrls.length > 0 && (
+                  <span className="flex items-center gap-1">
+                    <ImageIcon className="h-3 w-3" />
+                    {post.mediaUrls.length}
+                  </span>
                 )}
                 {post.isLinkPost && (
                   <span className="text-amber-600">Contains URL</span>
                 )}
               </div>
+
               {post.failureReason && (
-                <p className="mt-2 text-sm text-red-600">{post.failureReason}</p>
+                <p
+                  className="mt-2 select-text rounded bg-red-950/50 p-2 text-sm text-red-400"
+                  title={post.failureReason}
+                >
+                  {post.failureReason}
+                </p>
               )}
+
+              {post.status === "PUBLISHED" && post.xTweetId && (
+                <a
+                  href={`https://x.com/i/web/status/${post.xTweetId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-2 inline-flex items-center gap-1 text-sm text-sky-400 hover:underline"
+                >
+                  View on X <ExternalLink className="h-3 w-3" />
+                </a>
+              )}
+
               <div className="mt-3 flex flex-wrap gap-2">
                 {["DRAFT", "SCHEDULED", "FAILED"].includes(post.status) && (
                   <Button
@@ -192,6 +302,14 @@ export function PostList({ posts, onRefresh, filter }: Props) {
                     Schedule
                   </Button>
                 )}
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  disabled={loadingId === post.id}
+                  onClick={() => duplicatePost(post)}
+                >
+                  Duplicate
+                </Button>
                 {post.status === "FAILED" && (
                   <Button
                     size="sm"
@@ -230,9 +348,15 @@ export function PostList({ posts, onRefresh, filter }: Props) {
                     variant="danger"
                     disabled={loadingId === post.id}
                     onClick={() =>
-                      apiAction(post.id, () =>
-                        fetch(`/api/posts/${post.id}`, { method: "DELETE" })
-                      )
+                      setConfirm({
+                        title: "Delete post",
+                        message: "This cannot be undone.",
+                        action: () => {
+                          apiAction(post.id, () =>
+                            fetch(`/api/posts/${post.id}`, { method: "DELETE" })
+                          );
+                        },
+                      })
                     }
                   >
                     Delete

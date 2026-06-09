@@ -3,6 +3,7 @@ import { decrypt, encrypt } from "@/lib/encryption";
 import {
   needsTokenRefresh,
   refreshAccessToken,
+  revokeAccessToken,
   tokenExpiresAt,
 } from "@/lib/x/oauth";
 
@@ -77,5 +78,7 @@ export async function disconnectXAccount(userId: string, xAccountId: string) {
   if (!account) {
     throw new Error("X account not found");
   }
+  const accessToken = decrypt(account.accessTokenEnc);
+  await revokeAccessToken(accessToken);
   await prisma.xAccount.delete({ where: { id: xAccountId } });
 }

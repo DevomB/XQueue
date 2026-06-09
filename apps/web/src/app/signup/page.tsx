@@ -5,10 +5,8 @@ import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { BrandLogo } from "@/components/layout/brand-logo";
-
-const inputClass =
-  "w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-2.5 text-white placeholder:text-zinc-600 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -69,12 +67,12 @@ export default function SignupPage() {
               <label htmlFor="signup-email" className="mb-1.5 block text-sm font-medium text-zinc-300">
                 Email
               </label>
-              <input
+              <Input
                 id="signup-email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className={inputClass}
+                className="border-zinc-700 bg-zinc-950 text-white"
                 required
               />
             </div>
@@ -82,13 +80,13 @@ export default function SignupPage() {
               <label htmlFor="signup-password" className="mb-1.5 block text-sm font-medium text-zinc-300">
                 Password
               </label>
-              <input
+              <Input
                 id="signup-password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 minLength={8}
-                className={inputClass}
+                className="border-zinc-700 bg-zinc-950 text-white"
                 required
               />
               <p className="mt-1 text-xs text-zinc-500">At least 8 characters</p>

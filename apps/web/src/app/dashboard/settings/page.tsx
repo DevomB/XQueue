@@ -3,13 +3,19 @@
 import { Suspense, useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { useToast } from "@/components/ui/toast";
 import { COMMON_TIMEZONES } from "@/lib/timezones";
 
 type XAccount = { id: string; username: string; connectedAt: string };
 
 function SettingsContent() {
+  const { toast } = useToast();
   const searchParams = useSearchParams();
   const [timezone, setTimezone] = useState("UTC");
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [customTimezone, setCustomTimezone] = useState("");
   const [xAccounts, setXAccounts] = useState<XAccount[]>([]);
   const [message, setMessage] = useState<string | null>(null);
@@ -50,6 +56,7 @@ function SettingsContent() {
       return;
     }
     setMessage("Timezone saved.");
+    toast("Timezone saved", "success");
   }
 
   async function disconnect(xAccountId: string) {
@@ -64,19 +71,24 @@ function SettingsContent() {
   }
 
   async function deleteAccount() {
-    if (
-      !confirm(
-        "Delete your account and all scheduled posts? This cannot be undone."
-      )
-    ) {
-      return;
-    }
     await fetch("/api/account/delete", { method: "DELETE" });
     window.location.href = "/";
   }
 
   return (
     <div className="space-y-8" aria-live="polite">
+      <ConfirmDialog
+        open={showDeleteConfirm}
+        title="Delete account"
+        message="Delete your account and all scheduled posts? This cannot be undone."
+        confirmLabel="Delete account"
+        danger
+        onConfirm={() => {
+          setShowDeleteConfirm(false);
+          deleteAccount();
+        }}
+        onCancel={() => setShowDeleteConfirm(false)}
+      />
       <div>
         <h1 className="text-2xl font-bold">Settings</h1>
         <p className="mt-1 text-zinc-600 dark:text-zinc-400">
@@ -101,11 +113,11 @@ function SettingsContent() {
           Used for bulk paste scheduling and display.
         </p>
         <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-          <select
+          <Select
             id="settings-timezone"
             value={timezone}
             onChange={(e) => setTimezone(e.target.value)}
-            className="flex-1 rounded-lg border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+            className="flex-1"
           >
             {COMMON_TIMEZONES.map((tz) => (
               <option key={tz} value={tz}>
@@ -113,12 +125,12 @@ function SettingsContent() {
               </option>
             ))}
             <option value="custom">Custom IANA timezone...</option>
-          </select>
+          </Select>
           {timezone === "custom" && (
-            <input
+            <Input
               value={customTimezone}
               onChange={(e) => setCustomTimezone(e.target.value)}
-              className="flex-1 rounded-lg border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+              className="flex-1"
               placeholder="America/New_York"
             />
           )}
@@ -165,7 +177,7 @@ function SettingsContent() {
           variant="danger"
           size="sm"
           className="mt-4"
-          onClick={deleteAccount}
+          onClick={() => setShowDeleteConfirm(true)}
         >
           Delete account
         </Button>

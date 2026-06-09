@@ -1,24 +1,110 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Link from "next/link";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select } from "@/components/ui/select";
 import { UrlWarning } from "@/components/url-warning";
+import { useToast } from "@/components/ui/toast";
+import { PostPreview } from "@/components/compose/post-preview";
 import { MAX_IMAGES_PER_POST } from "@postwave/shared";
+
+const DRAFT_KEY = "postwave-compose-draft";
+
+type XAccount = { id: string; username: string };
 
 type Props = {
   timezone: string;
-  onCreated: () => void;
+  username?: string;
+  xAccounts?: XAccount[];
+  onCreated: (postId: string) => void;
 };
 
-export function ComposeForm({ timezone, onCreated }: Props) {
+export function ComposeForm({
+  timezone,
+  username,
+  xAccounts = [],
+  onCreated,
+}: Props) {
+  const { toast } = useToast();
   const [text, setText] = useState("");
   const [scheduledAt, setScheduledAt] = useState("");
   const [mediaUrls, setMediaUrls] = useState<string[]>([]);
+  const [xAccountId, setXAccountId] = useState("");
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const [restorePrompt, setRestorePrompt] = useState(false);
+
+  const xConnected = xAccounts.length > 0;
+
+  useEffect(() => {
+    if (xAccounts.length > 0 && !xAccountId) {
+      setXAccountId(xAccounts[0].id);
+    }
+  }, [xAccounts, xAccountId]);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(DRAFT_KEY);
+      if (saved) {
+        const draft = JSON.parse(saved) as {
+          text?: string;
+          mediaUrls?: string[];
+        };
+        if (draft.text || draft.mediaUrls?.length) {
+          setRestorePrompt(true);
+        }
+      }
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (text || mediaUrls.length > 0) {
+        localStorage.setItem(
+          DRAFT_KEY,
+          JSON.stringify({ text, mediaUrls })
+        );
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [text, mediaUrls]);
+
+  function restoreDraft() {
+    try {
+      const saved = localStorage.getItem(DRAFT_KEY);
+      if (saved) {
+        const draft = JSON.parse(saved) as {
+          text?: string;
+          mediaUrls?: string[];
+        };
+        if (draft.text) setText(draft.text);
+        if (draft.mediaUrls) setMediaUrls(draft.mediaUrls);
+      }
+    } catch {
+      /* ignore */
+    }
+    setRestorePrompt(false);
+  }
+
+  function discardDraft() {
+    localStorage.removeItem(DRAFT_KEY);
+    setRestorePrompt(false);
+  }
+
+  function scheduleInFiveMinutes() {
+    const d = new Date(Date.now() + 5 * 60 * 1000);
+    const pad = (n: number) => String(n).padStart(2, "0");
+    setScheduledAt(
+      `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+    );
+  }
 
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -48,15 +134,21 @@ export function ComposeForm({ timezone, onCreated }: Props) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (scheduledAt && !xConnected) {
+      setError("Connect an X account in Settings before scheduling.");
+      return;
+    }
+
     setLoading(true);
     setError(null);
-    setSuccess(null);
 
     const body: Record<string, unknown> = {
       text,
       timezone,
       mediaUrls,
     };
+
+    if (xAccountId) body.xAccountId = xAccountId;
 
     if (scheduledAt) {
       body.scheduledAt = new Date(scheduledAt).toISOString();
@@ -74,6 +166,7 @@ export function ComposeForm({ timezone, onCreated }: Props) {
     const data = await res.json();
     if (!res.ok) {
       setError(data.error ?? "Failed to create post");
+      toast(data.error ?? "Failed to create post", "error");
       setLoading(false);
       return;
     }
@@ -81,23 +174,59 @@ export function ComposeForm({ timezone, onCreated }: Props) {
     setText("");
     setScheduledAt("");
     setMediaUrls([]);
-    setSuccess(scheduledAt ? "Post scheduled." : "Draft saved.");
-    onCreated();
+    localStorage.removeItem(DRAFT_KEY);
+    const msg = scheduledAt ? "Post scheduled." : "Draft saved.";
+    toast(msg, "success");
+    onCreated(data.post.id);
     setLoading(false);
   }
 
   return (
+    <div className="grid gap-6 lg:grid-cols-2">
     <form onSubmit={handleSubmit} className="space-y-4" aria-live="polite">
+      {restorePrompt && (
+        <div className="rounded-lg border border-sky-800 bg-sky-950/50 p-3 text-sm">
+          <p className="text-sky-200">Restore unsaved draft?</p>
+          <div className="mt-2 flex gap-2">
+            <Button type="button" size="sm" onClick={restoreDraft}>
+              Restore
+            </Button>
+            <Button type="button" size="sm" variant="ghost" onClick={discardDraft}>
+              Discard
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {xAccounts.length > 1 && (
+        <div>
+          <label htmlFor="compose-account" className="mb-2 block text-sm font-medium">
+            Post as
+          </label>
+          <Select
+            id="compose-account"
+            value={xAccountId}
+            onChange={(e) => setXAccountId(e.target.value)}
+          >
+            {xAccounts.map((a) => (
+              <option key={a.id} value={a.id}>
+                @{a.username}
+              </option>
+            ))}
+          </Select>
+        </div>
+      )}
+
       <div>
         <label htmlFor="compose-text" className="mb-2 block text-sm font-medium">
           Post text
         </label>
-        <textarea
+        <Textarea
           id="compose-text"
           value={text}
           onChange={(e) => setText(e.target.value)}
           maxLength={280}
-          className="min-h-[120px] w-full rounded-lg border border-zinc-300 p-3 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+          className="min-h-[120px]"
           required
         />
         <p className="mt-1 text-xs text-zinc-500">{text.length}/280</p>
@@ -109,14 +238,27 @@ export function ComposeForm({ timezone, onCreated }: Props) {
         <label htmlFor="compose-schedule" className="mb-2 block text-sm font-medium">
           Schedule (optional)
         </label>
-        <input
-          id="compose-schedule"
-          type="datetime-local"
-          value={scheduledAt}
-          onChange={(e) => setScheduledAt(e.target.value)}
-          className="w-full rounded-lg border border-zinc-300 p-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
-        />
+        <div className="flex flex-wrap gap-2">
+          <Input
+            id="compose-schedule"
+            type="datetime-local"
+            value={scheduledAt}
+            onChange={(e) => setScheduledAt(e.target.value)}
+            className="flex-1"
+          />
+          <Button type="button" variant="secondary" size="sm" onClick={scheduleInFiveMinutes}>
+            +5 min
+          </Button>
+        </div>
         <p className="mt-1 text-xs text-zinc-500">Timezone: {timezone}</p>
+        {scheduledAt && !xConnected && (
+          <p className="mt-2 text-sm text-amber-500">
+            <Link href="/dashboard/settings" className="underline">
+              Connect X
+            </Link>{" "}
+            to schedule posts.
+          </p>
+        )}
       </div>
 
       <div>
@@ -129,6 +271,7 @@ export function ComposeForm({ timezone, onCreated }: Props) {
           accept="image/jpeg,image/png,image/webp"
           onChange={handleUpload}
           disabled={uploading || mediaUrls.length >= MAX_IMAGES_PER_POST}
+          className="text-sm text-zinc-400"
         />
         {uploading && (
           <p className="mt-1 text-xs text-zinc-500">Uploading...</p>
@@ -157,12 +300,29 @@ export function ComposeForm({ timezone, onCreated }: Props) {
         )}
       </div>
 
-      {error && <p className="text-sm text-red-600" role="alert">{error}</p>}
-      {success && <p className="text-sm text-emerald-600">{success}</p>}
+      {error && (
+        <p className="text-sm text-red-600" role="alert">
+          {error}
+        </p>
+      )}
 
-      <Button type="submit" disabled={loading || uploading || !text.trim()}>
+      <Button
+        type="submit"
+        disabled={
+          loading ||
+          uploading ||
+          !text.trim() ||
+          (Boolean(scheduledAt) && !xConnected)
+        }
+      >
         {loading ? "Saving..." : scheduledAt ? "Schedule post" : "Save draft"}
       </Button>
     </form>
+    <PostPreview
+      text={text}
+      username={xAccounts.find((a) => a.id === xAccountId)?.username ?? username}
+      mediaUrls={mediaUrls}
+    />
+    </div>
   );
 }

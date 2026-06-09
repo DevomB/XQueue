@@ -24,6 +24,10 @@ import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/marketing/reveal";
 import { SectionHeading } from "@/components/marketing/section-heading";
 import { Faq, type FaqItem } from "@/components/marketing/faq";
+import { TweetCard } from "@/components/marketing/tweet-card";
+import { Marquee } from "@/components/marketing/marquee";
+import { Counter } from "@/components/marketing/counter";
+import { InteractivePastePreview } from "@/components/marketing/interactive-paste-preview";
 
 const GITHUB_URL =
   process.env.NEXT_PUBLIC_GITHUB_REPO ?? "https://github.com";
@@ -127,13 +131,73 @@ export default function HomePage() {
           </div>
         </section>
 
+        <section className="border-y border-zinc-800 py-6">
+          <Marquee
+            items={[
+              "Bulk paste import",
+              "Official X API",
+              "Timezone-aware",
+              "Image posts",
+              "Self-hostable",
+              "Open source MIT",
+            ]}
+          />
+        </section>
+
         {/* Product mock */}
         <section className="relative mx-auto -mt-4 max-w-6xl px-4 pb-16">
           <Reveal>
             <div className="relative grid gap-4 lg:grid-cols-5">
               <QueuePreview />
-              <PastePreview />
+              <InteractivePastePreview />
             </div>
+          </Reveal>
+        </section>
+
+        <section className="mx-auto max-w-6xl px-4 py-16">
+          <Reveal>
+            <div className="mb-8 flex flex-wrap justify-center gap-10 text-center">
+              <div>
+                <p className="font-display text-3xl font-semibold text-white">
+                  <Counter to={1200} suffix="+" />
+                </p>
+                <p className="mt-1 text-xs text-zinc-500">Posts scheduled (illustrative)</p>
+              </div>
+              <div>
+                <p className="font-display text-3xl font-semibold text-white">
+                  <Counter to={99} suffix="%" />
+                </p>
+                <p className="mt-1 text-xs text-zinc-500">On-time delivery (illustrative)</p>
+              </div>
+            </div>
+            <p className="mb-8 text-center text-xs text-zinc-600">
+              Illustrative metrics for design purposes — not live production data.
+            </p>
+            <div className="grid gap-4 md:grid-cols-3">
+              <TweetCard
+                name="Alex Rivera"
+                handle="@alexbuilds"
+                avatar="from-violet-500 to-purple-400"
+                body="Finally a scheduler that doesn't need a browser tab open. Bulk paste + walk away."
+                verified
+              />
+              <TweetCard
+                name="Jordan Kim"
+                handle="@jordancreates"
+                avatar="from-amber-500 to-orange-400"
+                body="Self-hosted PostWave on Docker in an afternoon. My queue, my infra, my rules."
+              />
+              <TweetCard
+                name="Sam Ortiz"
+                handle="@samops"
+                avatar="from-emerald-500 to-teal-400"
+                body="Official API only — no sketchy automation. Exactly what I wanted for batch posting."
+                verified
+              />
+            </div>
+            <p className="mt-6 text-center text-xs text-zinc-600">
+              Illustrative testimonials — representative personas, not real individuals.
+            </p>
           </Reveal>
         </section>
 
@@ -245,7 +309,7 @@ pnpm dev && pnpm dev:worker`}
               <DeployCard
                 icon={Cloud}
                 title="AWS"
-                description="Terraform template deploys web, worker, RDS, and Redis to your AWS account."
+                description="Terraform template for S3 uploads today; RDS, Redis, and ECS planned."
                 href={`${GITHUB_URL}/tree/main/infra/deploy/aws`}
                 linkLabel="View AWS template"
               />
@@ -435,20 +499,3 @@ function QueuePreview() {
   );
 }
 
-function PastePreview() {
-  return (
-    <div className="flex flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900 shadow-2xl lg:col-span-2">
-      <div className="flex items-center gap-2 border-b border-zinc-800 bg-zinc-950 px-4 py-3">
-        <ClipboardPaste className="h-3.5 w-3.5 text-sky-400" />
-        <span className="font-mono text-xs text-zinc-500">bulk-paste.txt</span>
-      </div>
-      <pre className="flex-1 overflow-x-auto p-5 font-mono text-xs leading-relaxed text-zinc-300">
-{`2026-06-10 09:00 | Morning hook
-2026-06-10 14:00 | Product update
-2026-06-10 18:30 | Recap
-
-# no time → draft`}
-      </pre>
-    </div>
-  );
-}

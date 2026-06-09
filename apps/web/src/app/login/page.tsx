@@ -5,10 +5,8 @@ import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { BrandLogo } from "@/components/layout/brand-logo";
-
-const inputClass =
-  "w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-2.5 text-white placeholder:text-zinc-600 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -21,6 +19,14 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     setError(null);
+
+    const rl = await fetch("/api/auth/login-rate-limit", { method: "POST" });
+    if (!rl.ok) {
+      const data = await rl.json();
+      setError(data.error ?? "Too many login attempts");
+      setLoading(false);
+      return;
+    }
 
     const result = await signIn("credentials", {
       email,
@@ -51,26 +57,33 @@ export default function LoginPage() {
           </p>
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-zinc-300">
+              <label htmlFor="login-email" className="mb-1.5 block text-sm font-medium text-zinc-300">
                 Email
               </label>
-              <input
+              <Input
+                id="login-email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className={inputClass}
+                className="border-zinc-700 bg-zinc-950 text-white"
                 required
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-zinc-300">
-                Password
-              </label>
-              <input
+              <div className="mb-1.5 flex items-center justify-between">
+                <label htmlFor="login-password" className="text-sm font-medium text-zinc-300">
+                  Password
+                </label>
+                <Link href="/forgot-password" className="text-xs text-sky-400 hover:underline">
+                  Forgot password?
+                </Link>
+              </div>
+              <Input
+                id="login-password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className={inputClass}
+                className="border-zinc-700 bg-zinc-950 text-white"
                 required
               />
             </div>

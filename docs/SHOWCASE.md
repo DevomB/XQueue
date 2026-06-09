@@ -36,12 +36,8 @@ PostWave — OSS bulk X scheduler you self-host
 
 > Demo instance only. [Self-host for production](https://github.com/YOUR_USER/X-Post-Creator/blob/main/docs/SELF_HOST.md). [Disclaimer](https://github.com/YOUR_USER/X-Post-Creator/blob/main/DISCLAIMER.md).
 
-## Screenshot placeholder
+## Screenshot
 
-Add a screenshot or GIF to `docs/screenshot.png` and reference it in the README:
+![PostWave dashboard](screenshot.svg)
 
-```markdown
-![PostWave dashboard](docs/screenshot.png)
-```
-
-Recommended capture: queue view with bulk paste + scheduled posts.
+Replace `docs/screenshot.svg` with a real queue screenshot when available.

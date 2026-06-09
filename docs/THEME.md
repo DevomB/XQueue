@@ -12,7 +12,7 @@ times, and close the laptop. The cloud worker publishes on schedule through the
 **official X API** — no browser tab, no DOM hacks, no risk to your account.
 
 The website's only job: make a serious poster trust us in ~10 seconds and feel
-that the product is precise, safe, and clearly worth $15/mo.
+that the product is precise, safe, and clearly worth self-hosting — open source, no paywalls.
 
 ## 2. Theme name & mood
 

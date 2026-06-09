@@ -1,44 +1,41 @@
 # AWS Deployment (Your Account)
 
-Deploy PostWave into **your own AWS account** using Terraform.
+Terraform for PostWave AWS resources.
 
-## What gets created
+## What is implemented today
 
-- VPC with public subnets
-- RDS PostgreSQL (db.t3.micro)
-- ElastiCache Redis (cache.t3.micro)
-- S3 bucket for image uploads
-- ECS Fargate cluster with web + worker services
+| Resource | Status |
+|----------|--------|
+| S3 uploads bucket | **Implemented** (`main.tf`) |
+| RDS PostgreSQL | Planned |
+| ElastiCache Redis | Planned |
+| ECS Fargate (web + worker) | Planned |
 
-## Prerequisites
-
-- AWS CLI configured (`aws configure`)
-- Terraform 1.5+
-- Docker (for building images)
-
-## Quick start
+## Quick start (S3 only)
 
 ```bash
 cd infra/deploy/aws
 cp terraform.tfvars.example terraform.tfvars
-# Edit terraform.tfvars with your values
+# Set s3_bucket_name to a globally unique name
 
 terraform init
 terraform plan
 terraform apply
 ```
 
-## After apply
+After apply, set on your web service:
 
-1. Note outputs: `database_url`, `redis_url`, `s3_bucket`, `web_url`
-2. Set secrets in AWS Secrets Manager (see `variables.tf`)
-3. Build and push Docker images to ECR (see `ecs.tf` outputs)
-4. Update X Developer Console callback URL to your web URL
+```
+STORAGE_TYPE=s3
+S3_BUCKET=<output s3_bucket>
+S3_REGION=us-east-1
+S3_ACCESS_KEY_ID=...
+S3_SECRET_ACCESS_KEY=...
+S3_PUBLIC_URL=https://your-bucket.s3.amazonaws.com
+```
+
+Pair with Postgres (Neon/RDS) and Redis (Upstash/ElastiCache) per [docs/DEPLOYMENT.md](../../../docs/DEPLOYMENT.md).
 
 ## Cost warning
 
 You pay for all AWS resources. Use `terraform destroy` to tear down when not needed.
-
-## Liability
-
-This deploys to **your** AWS account. You are responsible for costs, security, and compliance. See [DISCLAIMER.md](../../../DISCLAIMER.md).

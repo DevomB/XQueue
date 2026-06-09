@@ -1,6 +1,7 @@
 import { mkdir, writeFile } from "fs/promises";
 import path from "path";
 import { randomBytes } from "crypto";
+import { buildSignedUploadUrl } from "./upload-signature";
 
 const ALLOWED_EXT: Record<string, string> = {
   "image/jpeg": "jpg",
@@ -28,8 +29,7 @@ async function storeLocal(buffer: Buffer, filename: string): Promise<string> {
   await mkdir(uploadDir, { recursive: true });
   await writeFile(path.join(uploadDir, filename), buffer);
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-  return `${appUrl}/api/uploads/${filename}`;
+  return buildSignedUploadUrl(filename);
 }
 
 async function storeS3(

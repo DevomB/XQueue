@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { isLinkPost, parseBulkPaste } from "@postwave/shared";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { UrlWarning } from "@/components/url-warning";
 
 type Props = {
@@ -57,15 +58,16 @@ export function BulkPasteForm({ timezone, onImported }: Props) {
     <div className="space-y-4">
       <div>
         <label className="mb-2 block text-sm font-medium">Bulk paste</label>
-        <textarea
+        <Textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder={`2026-06-05 14:00 | Your first post\n2026-06-05 18:30 | Another post\nJust a draft with no time`}
-          className="min-h-[160px] w-full rounded-lg border border-zinc-300 bg-white p-3 font-mono text-sm dark:border-zinc-700 dark:bg-zinc-950"
+          className="min-h-[160px] font-mono"
         />
         <p className="mt-1 text-xs text-zinc-500">
           Format: YYYY-MM-DD HH:mm | post text. Lines without a datetime save as
-          drafts. Times use your timezone ({timezone}).
+          drafts. Times use your timezone ({timezone}). Images are not supported in
+          bulk paste — use Compose for image posts.
         </p>
       </div>
 

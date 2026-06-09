@@ -9,7 +9,7 @@
     "db:migrate": "pnpm --filter @postwave/web db:migrate",
     "db:push": "pnpm --filter @postwave/web db:push",
     "db:studio": "pnpm --filter @postwave/web db:studio",
-    "test": "pnpm --filter @postwave/web test && pnpm --filter @postwave/shared test",
+    "test": "pnpm --filter @postwave/web test && pnpm --filter @postwave/shared test && pnpm --filter @postwave/worker test",
     "lint": "pnpm -r lint"
   },
   "engines": {
