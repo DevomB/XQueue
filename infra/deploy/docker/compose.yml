@@ -1,0 +1,16 @@
+services:
+  daemon:
+    build:
+      context: ../../..
+      dockerfile: apps/worker/Dockerfile
+    ports:
+      - "8081:8081"
+    environment:
+      POSTWAVE_DATA_DIR: /data
+      WORKER_HEALTH_PORT: 8081
+    env_file: ../../../.env
+    volumes:
+      - postwave_data:/data
+
+volumes:
+  postwave_data:

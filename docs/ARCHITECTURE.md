@@ -1,43 +1,57 @@
 # PostWave Architecture
 
-## Components
+## Overview
 
-- **apps/web** — Next.js 16 app: landing page, dashboard, REST API, X OAuth
-- **apps/worker** — BullMQ consumer: publishes scheduled posts via X API v2
-- **packages/shared** — Zod validators, bulk paste parser, shared constants
+PostWave is a **local-first** X post scheduler with one shared engine and three distribution surfaces:
 
-## Data flow
+| Surface | Package | Role |
+|---------|---------|------|
+| CLI | `apps/cli` | Commands, OAuth login, foreground daemon |
+| Desktop | `apps/desktop` | React UI over IPC (Tauri-ready) |
+| Deploy | `apps/worker` | Always-on daemon for Docker/Fly/Railway |
+| Marketing | `apps/web` | Public site only |
 
-1. User schedules post → API writes `ScheduledPost` to Postgres
-2. API enqueues BullMQ job with delay = `scheduledAt - now`
-3. Worker picks up job → refreshes OAuth token if needed → `POST /2/tweets`
-4. Worker updates status to `PUBLISHED` or `FAILED` (+ email on failure via Resend)
+## Engine
 
-## Post status lifecycle
+```
+packages/shared     Validators, bulk paste, constants (client-safe)
+packages/core       Publish, OAuth, encryption, config
+packages/storage-sqlite   SQLite persistence + min-heap scheduler
+```
 
-`DRAFT` → `SCHEDULED` → `QUEUED` (worker lock) → `PUBLISHED` | `FAILED` | `CANCELLED`
+### Scheduler
 
-- **QUEUED recovery:** If a worker crashes mid-publish, a cron resets stale `QUEUED` posts (default 10 min) back to `SCHEDULED` and re-enqueues.
-- **Dead-letter queue:** After BullMQ max retries, jobs land in `publish-post-dlq`; a DLQ worker marks posts `FAILED` with the error reason.
+Scheduled posts are stored in SQLite with index `(status, scheduled_at)`. An in-memory **min-heap** orders publish times:
 
-## Media URL reachability
+- Schedule: O(log n) push
+- Next run: O(1) peek
+- Cancel: tombstone + optional compaction
 
-The worker fetches `mediaUrls` at publish time. In production:
+On daemon start, the heap is rebuilt from `SCHEDULED` rows ordered by `scheduled_at`.
 
-- **S3:** Use a bucket URL the worker can reach (public object or presigned GET). Configure CORS if needed.
-- **Local storage:** Signed URLs (`/api/uploads/{file}?sig=...`) must be reachable from the worker process at `NEXT_PUBLIC_APP_URL`.
+### Publish flow
 
-## Auth layers
+1. User schedules post → SQLite row `SCHEDULED`
+2. Heap scheduler fires at `scheduled_at`
+3. Publisher locks row → `QUEUED`, refreshes OAuth token if needed
+4. Upload local media → `POST /2/tweets`
+5. Row → `PUBLISHED` or `FAILED` (optional email)
 
-- **PostWave account:** NextAuth credentials (email/password, bcrypt)
-- **X connection:** OAuth 2.0 PKCE, tokens encrypted at rest (AES-256-GCM)
+Stale `QUEUED` rows (worker crash) are recovered on an interval.
 
-## External services
+## Data
 
-- PostgreSQL, Redis, X API v2
-- Resend (optional — failure alert emails)
+Single-user SQLite at `~/.postwave/data/` (or `POSTWAVE_DATA_DIR`). X tokens encrypted at rest (AES-256-GCM).
 
-## Storage
+## IPC (desktop ↔ daemon)
 
-- `STORAGE_TYPE=local` — image uploads to disk (Docker / local dev)
-- `STORAGE_TYPE=s3` — S3-compatible storage for cloud deploys
+JSON-RPC 2.0 over HTTP when `POSTWAVE_IPC_PORT` is set. See `docs/ipc-protocol.md`.
+
+```mermaid
+flowchart LR
+  Desktop[apps/desktop] -->|IPC| Daemon[postwave daemon]
+  CLI[apps/cli] --> Daemon
+  Daemon --> Core[@postwave/core]
+  Core --> SQLite[(SQLite)]
+  Core --> XAPI[X API v2]
+```

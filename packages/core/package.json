@@ -1,0 +1,25 @@
+{
+  "name": "@postwave/core",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest run",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@postwave/shared": "workspace:*",
+    "zod": "^3.24.2"
+  },
+  "optionalDependencies": {
+    "resend": "^4.1.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.24",
+    "typescript": "^5.8.2",
+    "vitest": "^3.0.9"
+  }
+}

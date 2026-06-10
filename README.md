@@ -2,97 +2,69 @@
 
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-Queue and schedule X posts in bulk. Paste a batch, set the times, close your browser — PostWave publishes via the official X API.
+Queue and schedule X posts in bulk. Paste a batch, set the times, and let the daemon publish via the official X API.
 
-**Open source.** Self-host on Docker or deploy to your own AWS account. No paywalls.
+**Open source.** Run locally with the CLI or desktop app, or deploy the daemon to your own cloud. No hosted service — your keys, your data.
 
-## Features
+## Three ways to run
 
-- Bulk paste import (`YYYY-MM-DD HH:mm | text`)
-- Single-post compose with drafts
-- Timezone-aware scheduling
-- Image posts (up to 4 per post)
-- Edit, cancel, retry failed posts
-- Official X OAuth 2.0 + API v2
-- BullMQ worker for reliable background publishing
+| Surface | For |
+|---------|-----|
+| **CLI** (`postwave`) | Developers, scripts, headless servers |
+| **Desktop** | Tray app with queue, compose, and settings |
+| **Deploy daemon** | 24/7 publishing on Docker, Fly.io, or Railway |
 
-## Stack
-
-| Layer | Tech |
-|-------|------|
-| Web | Next.js 16, React 19, NextAuth, Prisma, Tailwind 4 |
-| Worker | BullMQ + Redis |
-| Database | PostgreSQL 16 |
-| Shared | Zod validators, bulk paste parser |
-
-## Quick start
-
-### Prerequisites
-
-- Node.js 20+
-- pnpm 9+
-- Docker (Postgres + Redis)
-
-### 1. Clone and install
+## Quick start (CLI)
 
 ```bash
-git clone https://github.com/YOUR_USER/X-Post-Creator.git
+git clone https://github.com/DevomB/X-Post-Creator.git
 cd X-Post-Creator
 pnpm install
+pnpm --filter @postwave/cli build
+
+# Install globally from the repo, or use node apps/cli/dist/index.js
+node apps/cli/dist/index.js init
+node apps/cli/dist/index.js login
+node apps/cli/dist/index.js daemon
 ```
 
-### 2. Environment
+Configure X API credentials in `~/.postwave/config.json`. See [docs/X_DEVELOPER_SETUP.md](docs/X_DEVELOPER_SETUP.md).
+
+## Development
 
 ```bash
-cp .env.example .env
-# Fill in AUTH_SECRET, TOKEN_ENCRYPTION_KEY, X API credentials
+pnpm install
+pnpm dev              # marketing site
+pnpm dev:cli          # CLI watch
+pnpm dev:desktop      # desktop UI (Vite)
+pnpm dev:worker       # deploy daemon
+pnpm build:all
+pnpm test
 ```
-
-Generate secrets:
-
-```bash
-openssl rand -base64 32   # AUTH_SECRET
-openssl rand -base64 32   # TOKEN_ENCRYPTION_KEY
-```
-
-### 3. Start infrastructure
-
-```bash
-docker compose up -d
-pnpm db:push
-```
-
-### 4. Run
-
-```bash
-# Terminal 1 — web app
-pnpm dev
-
-# Terminal 2 — publish worker
-pnpm dev:worker
-```
-
-Open [http://localhost:3000](http://localhost:3000).
-
-See [docs/SELF_HOST.md](docs/SELF_HOST.md) for the full guide and [docs/X_DEVELOPER_SETUP.md](docs/X_DEVELOPER_SETUP.md) for X API setup.
 
 ## Project structure
 
 ```
-apps/web/          Next.js app (landing + dashboard + API)
-apps/worker/       BullMQ worker for scheduled publishing
-packages/shared/   Validators, bulk paste parser, constants
-infra/deploy/      AWS Terraform template
-docs/              Self-host, deployment, architecture guides
+apps/cli/              postwave CLI + background daemon
+apps/desktop/          Vite + React UI (Tauri shell ready)
+apps/web/              Marketing site only
+apps/worker/           Deploy daemon for Docker/Fly/Railway
+packages/core/         Publish engine, OAuth, encryption
+packages/storage-sqlite/  SQLite + min-heap scheduler
+packages/shared/       Validators, bulk paste parser
+infra/deploy/          Docker, Fly, Railway templates
+docs/                  Install, deployment, architecture
 ```
 
-## Deploy
+## Deploy (always-on)
 
-| Target | Guide |
-|--------|-------|
-| Docker Compose | [docs/SELF_HOST.md](docs/SELF_HOST.md) |
-| AWS (your account) | [infra/deploy/aws/README.md](infra/deploy/aws/README.md) |
-| Railway / Fly.io | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) |
+```bash
+docker compose --profile deploy up -d
+# or
+postwave deploy fly
+```
+
+See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) and [docs/INSTALL.md](docs/INSTALL.md).
 
 ## Disclaimer
 
@@ -101,9 +73,3 @@ Software provided **AS IS** without warranty. You operate your own instance and 
 ## License
 
 [MIT](LICENSE) — not affiliated with X Corp.
-
-## Showcase
-
-Sample posts for GitHub/X: [docs/SHOWCASE.md](docs/SHOWCASE.md)
-
-![PostWave dashboard](docs/screenshot.svg)

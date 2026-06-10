@@ -32,18 +32,21 @@ import { InteractivePastePreview } from "@/components/marketing/interactive-past
 const GITHUB_URL =
   process.env.NEXT_PUBLIC_GITHUB_REPO ?? "https://github.com";
 
+const RELEASES_URL = `${GITHUB_URL}/releases`;
+const NPM_INSTALL = "npm install -g postwave";
+
 const faqs: FaqItem[] = [
   {
     q: "Is PostWave free?",
-    a: "Yes. PostWave is open source under the MIT license. Self-host it on your machine or your cloud account. You only pay for your own infrastructure and X API usage.",
+    a: "Yes. PostWave is open source under the MIT license. Run the CLI or desktop app locally, or deploy the daemon to your own cloud. You only pay for your X API usage.",
   },
   {
     q: "Will this get my X account flagged?",
     a: "PostWave publishes through X's official API using OAuth — not browser automation. That is the sanctioned method third-party apps are expected to use.",
   },
   {
-    q: "Do I need to keep my browser open?",
-    a: "No. A background worker publishes queued posts at the scheduled time whether you are online or not.",
+    q: "Do I need to keep my computer on?",
+    a: "The CLI and desktop app need your machine awake at publish time, or a background daemon running. For 24/7 scheduling without your laptop, deploy the daemon to Docker, Fly.io, or Railway.",
   },
   {
     q: "What's the bulk paste format?",
@@ -94,26 +97,27 @@ export default function HomePage() {
 
             <Reveal delay={120}>
               <p className="mx-auto mt-6 max-w-2xl text-lg text-zinc-400">
-                Bulk-schedule X posts through the official API. Self-host on Docker
-                or deploy to your own AWS account — full control, no paywalls.
+                Bulk-schedule X posts through the official API. CLI, desktop app, or
+                deploy daemon — your API keys, your machine, no hosted service.
               </p>
             </Reveal>
 
             <Reveal delay={180}>
               <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-                <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">
+                <a href={RELEASES_URL} target="_blank" rel="noopener noreferrer">
                   <Button size="lg" className="group">
-                    <Github className="mr-2 h-4 w-4" />
-                    View on GitHub
+                    Download desktop
                     <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                   </Button>
                 </a>
-                <Link href="/signup">
+                <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">
                   <Button size="lg" variant="secondary">
-                    Try the app
+                    <Github className="mr-2 h-4 w-4" />
+                    GitHub
                   </Button>
-                </Link>
+                </a>
               </div>
+              <p className="mt-4 font-mono text-sm text-zinc-500">{NPM_INSTALL}</p>
             </Reveal>
 
             <Reveal delay={240}>
@@ -228,7 +232,7 @@ export default function HomePage() {
                 icon: Cloud,
                 step: "03",
                 title: "Close the laptop",
-                body: "The BullMQ worker publishes via the official X API while you are offline.",
+                body: "The scheduling daemon publishes via the official X API while you are offline.",
               },
             ].map((s, i) => (
               <Reveal key={s.step} delay={i * 80}>
@@ -275,13 +279,48 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* Three ways to run */}
+        <section id="ways-to-run" className="scroll-mt-20 mx-auto max-w-6xl px-4 py-20">
+          <Reveal>
+            <SectionHeading
+              eyebrow="Get started"
+              title="Three ways to run PostWave"
+              description="Same engine — pick the surface that fits how you work."
+            />
+          </Reveal>
+          <div className="mt-14 grid gap-6 md:grid-cols-3">
+            <DeployCard
+              icon={Terminal}
+              title="CLI"
+              description="Scriptable scheduling for developers and headless servers."
+              code={`${NPM_INSTALL}
+postwave init
+postwave login
+postwave daemon`}
+            />
+            <DeployCard
+              icon={Layers}
+              title="Desktop"
+              description="Tray app with queue, compose, and settings — no terminal required."
+              href={RELEASES_URL}
+              linkLabel="Download releases"
+            />
+            <DeployCard
+              icon={Server}
+              title="Deploy daemon"
+              description="Always-on publishing on your Fly.io, Railway, or Docker host."
+              code={"postwave deploy fly\n# or: docker compose --profile deploy up -d"}
+            />
+          </div>
+        </section>
+
         {/* Tech stack */}
         <section className="mx-auto max-w-6xl px-4 py-20">
           <Reveal>
             <div className="grid gap-px overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-800 sm:grid-cols-3">
-              <Stat value="Next.js 16" label="App Router + React 19" />
-              <Stat value="BullMQ" label="Reliable scheduled publishing" />
-              <Stat value="PostgreSQL" label="Posts, users, encrypted tokens" />
+              <Stat value="SQLite" label="Local-first post storage" />
+              <Stat value="Min-heap" label="O(log n) scheduling" />
+              <Stat value="X API v2" label="Official OAuth publishing" />
             </div>
           </Reveal>
         </section>
@@ -299,32 +338,29 @@ export default function HomePage() {
             <div className="mt-14 grid gap-6 md:grid-cols-3">
               <DeployCard
                 icon={Terminal}
-                title="Docker Compose"
-                description="Fastest way to try locally. Postgres + Redis included."
-                code={`git clone ${GITHUB_URL.replace("https://github.com/", "")}
-docker compose up -d
-pnpm install && pnpm db:push
-pnpm dev && pnpm dev:worker`}
+                title="Docker"
+                description="Run the deploy daemon with a persistent volume at /data."
+                code={`docker compose --profile deploy up -d
+curl localhost:8081/health`}
               />
               <DeployCard
                 icon={Cloud}
-                title="AWS"
-                description="Terraform template for S3 uploads today; RDS, Redis, and ECS planned."
-                href={`${GITHUB_URL}/tree/main/infra/deploy/aws`}
-                linkLabel="View AWS template"
+                title="Fly.io"
+                description="Generate a Fly app with SQLite volume via the CLI wizard."
+                code="postwave deploy fly"
               />
               <DeployCard
                 icon={Server}
-                title="Railway / Fly.io"
-                description="Use included configs for the worker. Pair with Vercel or your own web host."
+                title="Railway"
+                description="Deploy the daemon using the included Railway template."
                 href={`${GITHUB_URL}/blob/main/docs/DEPLOYMENT.md`}
                 linkLabel="Deployment guide"
               />
             </div>
             <p className="mt-8 text-center text-xs text-zinc-600">
               See{" "}
-              <a href={`${GITHUB_URL}/blob/main/docs/SELF_HOST.md`} className="text-zinc-500 hover:text-sky-400">
-                docs/SELF_HOST.md
+              <a href={`${GITHUB_URL}/blob/main/docs/INSTALL.md`} className="text-zinc-500 hover:text-sky-400">
+                docs/INSTALL.md
               </a>{" "}
               for the full setup guide.{" "}
               <Link href="/disclaimer" className="text-zinc-500 hover:text-sky-400">
@@ -385,21 +421,19 @@ pnpm dev && pnpm dev:worker`}
                 Star it. Fork it. Ship posts.
               </h2>
               <p className="mx-auto mt-4 max-w-lg text-zinc-400">
-                Open-source bulk scheduling for X. Built with Next.js, BullMQ, and
-                the official X API v2.
+                Open-source bulk scheduling for X. CLI, desktop, and deploy daemon
+                powered by a shared engine and the official X API v2.
               </p>
               <div className="mt-8 flex flex-wrap justify-center gap-4">
+                <a href={RELEASES_URL} target="_blank" rel="noopener noreferrer">
+                  <Button size="lg">Download</Button>
+                </a>
                 <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">
-                  <Button size="lg">
+                  <Button size="lg" variant="secondary">
                     <Github className="mr-2 h-4 w-4" />
                     GitHub
                   </Button>
                 </a>
-                <Link href="/signup">
-                  <Button size="lg" variant="secondary">
-                    Try the app
-                  </Button>
-                </Link>
               </div>
             </div>
           </Reveal>

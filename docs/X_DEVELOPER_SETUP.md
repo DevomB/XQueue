@@ -14,8 +14,8 @@ Complete these steps before PostWave can publish posts.
 2. Enable **OAuth 2.0**
 3. Set app permissions: **Read and write**
 4. Set callback URLs:
-   - `http://localhost:3000/api/x/callback` (development)
-   - `https://postwave.social/api/x/callback` (production)
+   - `http://127.0.0.1:8787/callback` (CLI / desktop login)
+   - `postwave://oauth/callback` (desktop deep link, when using Tauri)
 
 ## 3. OAuth 2.0 settings
 
@@ -26,7 +26,7 @@ Complete these steps before PostWave can publish posts.
 ```
 X_CLIENT_ID=your_client_id
 X_CLIENT_SECRET=your_client_secret
-X_CALLBACK_URL=http://localhost:3000/api/x/callback
+X_CALLBACK_URL=http://127.0.0.1:8787/callback
 ```
 
 ## 4. API credits

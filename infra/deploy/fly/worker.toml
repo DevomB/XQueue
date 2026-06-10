@@ -1,0 +1,20 @@
+app = "postwave-daemon"
+primary_region = "iad"
+
+[build]
+  dockerfile = "../../../apps/worker/Dockerfile"
+
+[env]
+  WORKER_HEALTH_PORT = "8081"
+  POSTWAVE_DATA_DIR = "/data"
+
+[mounts]
+  source = "postwave_data"
+  destination = "/data"
+
+[[services]]
+  internal_port = 8081
+  protocol = "tcp"
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1

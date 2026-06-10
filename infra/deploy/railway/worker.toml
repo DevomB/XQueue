@@ -1,0 +1,8 @@
+[build]
+builder = "NIXPACKS"
+buildCommand = "pnpm install && pnpm --filter @postwave/shared build && pnpm --filter @postwave/core build && pnpm --filter @postwave/storage-sqlite build && pnpm --filter @postwave/worker build"
+
+[deploy]
+startCommand = "pnpm --filter @postwave/worker start"
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10

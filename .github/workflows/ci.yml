@@ -8,24 +8,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_USER: postwave
-          POSTGRES_PASSWORD: postwave
-          POSTGRES_DB: postwave
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-      redis:
-        image: redis:7
-        ports:
-          - 6379:6379
 
     steps:
       - uses: actions/checkout@v4
@@ -45,36 +27,36 @@ jobs:
       - name: Build shared
         run: pnpm --filter @postwave/shared build
 
+      - name: Build core
+        run: pnpm --filter @postwave/core build
+
+      - name: Build storage-sqlite
+        run: pnpm --filter @postwave/storage-sqlite build
+
       - name: Lint
         run: pnpm lint
 
       - name: Test
         run: pnpm test
         env:
-          DATABASE_URL: postgresql://postwave:postwave@localhost:5432/postwave
-          REDIS_URL: redis://localhost:6379
-          AUTH_SECRET: ci-test-secret-minimum-32-chars-long
           TOKEN_ENCRYPTION_KEY: dGVzdC1rZXktMzJieXRzLWJhc2U2NC1wYWQ=
 
-      - name: Build web
-        run: pnpm --filter @postwave/web build
-        env:
-          DATABASE_URL: postgresql://postwave:postwave@localhost:5432/postwave
-          AUTH_SECRET: ci-test-secret-minimum-32-chars-long
-          TOKEN_ENCRYPTION_KEY: dGVzdC1rZXktMzJieXRzLWJhc2U2NC1wYWQ=
+      - name: Build CLI
+        run: pnpm --filter @postwave/cli build
 
       - name: Build worker
         run: pnpm --filter @postwave/worker build
 
+      - name: Build web
+        run: pnpm --filter @postwave/web build
+
+      - name: Build desktop
+        run: pnpm --filter @postwave/desktop build
+
       - name: Install Playwright browsers
         run: pnpm --filter @postwave/web exec playwright install chromium
 
-      - name: Prepare database for E2E
-        run: pnpm db:push
-        env:
-          DATABASE_URL: postgresql://postwave:postwave@localhost:5432/postwave
-
-      - name: E2E smoke tests
+      - name: Marketing E2E
         run: pnpm --filter @postwave/web test:e2e
         env:
           PLAYWRIGHT_BASE_URL: http://localhost:3000

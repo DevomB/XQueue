@@ -1,0 +1,25 @@
+{
+  "name": "@postwave/storage-sqlite",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest run",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@postwave/core": "workspace:*",
+    "@postwave/shared": "workspace:*",
+    "better-sqlite3": "^11.9.1"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.12",
+    "@types/node": "^20.17.24",
+    "typescript": "^5.8.2",
+    "vitest": "^3.0.9"
+  }
+}

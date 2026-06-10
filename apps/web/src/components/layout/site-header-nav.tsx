@@ -8,17 +8,16 @@ import { Button } from "@/components/ui/button";
 const GITHUB_URL =
   process.env.NEXT_PUBLIC_GITHUB_REPO ?? "https://github.com";
 
-type Props = {
-  isLoggedIn: boolean;
-};
+const RELEASES_URL = `${GITHUB_URL}/releases`;
 
-export function SiteHeaderNav({ isLoggedIn }: Props) {
+export function SiteHeaderNav() {
   const [open, setOpen] = useState(false);
 
   const links = [
     { href: "/#features", label: "Features" },
-    { href: "/#deploy", label: "Self-host" },
+    { href: "/#ways-to-run", label: "Get started" },
     { href: "/#faq", label: "FAQ" },
+    { href: "/docs", label: "Docs" },
     { href: GITHUB_URL, label: "GitHub", external: true },
   ];
 
@@ -46,23 +45,9 @@ export function SiteHeaderNav({ isLoggedIn }: Props) {
             </Link>
           )
         )}
-        {isLoggedIn ? (
-          <Link href="/dashboard">
-            <Button size="sm">Dashboard</Button>
-          </Link>
-        ) : (
-          <>
-            <Link
-              href="/login"
-              className="text-zinc-400 transition-colors hover:text-white"
-            >
-              Log in
-            </Link>
-            <Link href="/signup">
-              <Button size="sm">Get started</Button>
-            </Link>
-          </>
-        )}
+        <a href={RELEASES_URL} target="_blank" rel="noopener noreferrer">
+          <Button size="sm">Download</Button>
+        </a>
       </nav>
 
       <button
@@ -101,24 +86,16 @@ export function SiteHeaderNav({ isLoggedIn }: Props) {
                 </Link>
               )
             )}
-            {isLoggedIn ? (
-              <Link href="/dashboard" onClick={() => setOpen(false)}>
-                <Button size="sm" className="w-full">
-                  Dashboard
-                </Button>
-              </Link>
-            ) : (
-              <>
-                <Link href="/login" onClick={() => setOpen(false)}>
-                  Log in
-                </Link>
-                <Link href="/signup" onClick={() => setOpen(false)}>
-                  <Button size="sm" className="w-full">
-                    Get started
-                  </Button>
-                </Link>
-              </>
-            )}
+            <a
+              href={RELEASES_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setOpen(false)}
+            >
+              <Button size="sm" className="w-full">
+                Download
+              </Button>
+            </a>
           </div>
         </div>
       )}

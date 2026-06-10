@@ -1,0 +1,46 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build-cli:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install
+      - run: pnpm --filter @postwave/shared build
+      - run: pnpm --filter @postwave/core build
+      - run: pnpm --filter @postwave/storage-sqlite build
+      - run: pnpm --filter @postwave/cli build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: postwave-cli-linux
+          path: apps/cli/dist/index.js
+
+  build-desktop:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install
+      - run: pnpm --filter @postwave/desktop build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: postwave-desktop-web
+          path: apps/desktop/dist
